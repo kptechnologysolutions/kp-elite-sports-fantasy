@@ -17,11 +17,74 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   
-  const { login } = useSleeperStore();
+  const { login, logout } = useSleeperStore();
   
-  // Clean up old storage on mount
+  const clearAllData = () => {
+    try {
+      // Clear Zustand store
+      logout();
+      
+      // Clear all localStorage
+      localStorage.clear();
+      sessionStorage.clear();
+      
+      // Clear any service worker caches if they exist
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(registrations => {
+          registrations.forEach(registration => registration.unregister());
+        });
+      }
+      
+      // Clear browser cache (this will prompt user)
+      if ('caches' in window) {
+        caches.keys().then(names => {
+          names.forEach(name => caches.delete(name));
+        });
+      }
+      
+      setError('');
+      alert('All data cleared! You can now try logging in again.');
+      
+      // Reload the page to ensure clean state
+      window.location.reload();
+    } catch (error) {
+      console.error('Error clearing data:', error);
+      alert('Please manually clear your browser cache and try again.');
+    }
+  };
+  
+  // Clean up old storage and corrupted data on mount
   useEffect(() => {
-    clearOldStorage();
+    try {
+      clearOldStorage();
+      
+      // Clear any potentially corrupted Zustand store data
+      const storeData = localStorage.getItem('sleeper-store');
+      if (storeData) {
+        try {
+          JSON.parse(storeData);
+        } catch (e) {
+          console.log('Corrupted store data detected, clearing...');
+          localStorage.removeItem('sleeper-store');
+        }
+      }
+      
+      // Clear any old authentication state that might be stuck
+      const currentUser = useSleeperStore.getState().user;
+      if (currentUser && !useSleeperStore.getState()._hasHydrated) {
+        console.log('Clearing potentially stuck user state...');
+        useSleeperStore.getState().logout();
+      }
+    } catch (error) {
+      console.error('Error during storage cleanup:', error);
+      // Force clear everything if there's an error
+      try {
+        localStorage.clear();
+        sessionStorage.clear();
+      } catch (e) {
+        console.error('Failed to clear storage:', e);
+      }
+    }
   }, []);
   
   const handleLogin = async (e: React.FormEvent) => {
@@ -169,7 +232,23 @@ export default function LoginPage() {
             </Button>
           </form>
           
-          <div className="mt-8 text-center space-y-2">
+          {/* Troubleshooting section */}
+          <div className="mt-6 p-4 bg-muted/50 rounded-lg">
+            <p className="text-sm text-muted-foreground mb-3">
+              <strong>Login issues?</strong> If login isn't working, try clearing your browser data:
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={clearAllData}
+              className="w-full"
+            >
+              Clear Browser Cache & Data
+            </Button>
+          </div>
+          
+          <div className="mt-4 text-center space-y-2">
             <p className="text-sm text-muted-foreground">Don't have a Sleeper account?</p>
             <a
               href="https://sleeper.app"

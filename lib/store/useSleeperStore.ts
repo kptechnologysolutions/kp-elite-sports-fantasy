@@ -294,14 +294,40 @@ const useSleeperStore = create<SleeperStore>()(
     }),
     {
       name: 'sleeper-store',
+      version: 2, // Increment this to force clear old incompatible data
       partialize: (state) => ({
         user: state.user,
         currentLeague: state.currentLeague,
-        currentWeek: state.currentWeek
+        currentWeek: state.currentWeek,
+        _version: 2 // Store version with data
       }),
       onRehydrateStorage: () => (state) => {
         try {
           console.log('Store rehydrated with state:', !!state?.user);
+          
+          // Check for version mismatch and clear if needed (client-side only)
+          if (typeof window !== 'undefined') {
+            const storedData = localStorage.getItem('sleeper-store');
+            if (storedData) {
+              try {
+                const parsed = JSON.parse(storedData);
+                if (!parsed.state?._version || parsed.state._version < 2) {
+                  console.log('Old store version detected, clearing...');
+                  localStorage.removeItem('sleeper-store');
+                  // Reset to clean state
+                  if (state) {
+                    state.user = null;
+                    state.currentLeague = null;
+                    state.currentWeek = 1;
+                  }
+                }
+              } catch (e) {
+                console.log('Corrupted store data, clearing...');
+                localStorage.removeItem('sleeper-store');
+              }
+            }
+          }
+          
           state?.setHasHydrated(true);
         } catch (error) {
           console.error('Error during store rehydration:', error);
