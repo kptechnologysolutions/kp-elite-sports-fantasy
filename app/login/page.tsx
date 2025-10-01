@@ -36,10 +36,32 @@ export default function LoginPage() {
     setError('');
     
     try {
-      console.log('Attempting login for:', username);
+      console.log('=== LOGIN ATTEMPT START ===');
+      console.log('Username:', username);
       console.log('Store state before login:', useSleeperStore.getState().user);
+      console.log('Environment:', {
+        isDev: process.env.NODE_ENV === 'development',
+        userAgent: navigator.userAgent,
+        url: window.location.href
+      });
       
+      // Test Sleeper API connectivity first
+      console.log('Testing Sleeper API connectivity...');
+      const testResponse = await fetch('https://api.sleeper.app/v1/state/nfl');
+      console.log('Sleeper API test:', {
+        status: testResponse.status,
+        ok: testResponse.ok
+      });
+      
+      if (!testResponse.ok) {
+        throw new Error(`Sleeper API is not accessible (${testResponse.status})`);
+      }
+      
+      console.log('Calling login function...');
       await login(username);
+      
+      // Add a small delay to ensure state updates
+      await new Promise(resolve => setTimeout(resolve, 100));
       
       // Check if login actually worked
       const storeAfterLogin = useSleeperStore.getState();
@@ -47,19 +69,44 @@ export default function LoginPage() {
         user: storeAfterLogin.user,
         leagues: storeAfterLogin.leagues?.length || 0,
         isLoading: storeAfterLogin.isLoading,
-        error: storeAfterLogin.error
+        error: storeAfterLogin.error,
+        hasHydrated: storeAfterLogin._hasHydrated
       });
       
       if (storeAfterLogin.user) {
-        console.log('Login successful, redirecting...');
+        console.log('Login successful, redirecting to dashboard...');
         router.push('/dashboard/sleeper');
+      } else if (storeAfterLogin.error) {
+        console.error('Login failed with store error:', storeAfterLogin.error);
+        setError(storeAfterLogin.error);
       } else {
         console.error('Login appeared to succeed but no user in store');
-        setError('Login failed - no user data received');
+        setError('Login failed - no user data received. Please try again.');
       }
+      console.log('=== LOGIN ATTEMPT END ===');
     } catch (err: any) {
-      console.error('Login error:', err);
-      setError(err.message || 'Failed to connect to Sleeper. Please check your username.');
+      console.error('=== LOGIN ERROR ===');
+      console.error('Error details:', {
+        message: err.message,
+        name: err.name,
+        stack: err.stack,
+        cause: err.cause
+      });
+      
+      let errorMessage = 'Failed to connect to Sleeper.';
+      
+      if (err.message.includes('not found') || err.message.includes('404')) {
+        errorMessage = `Username "${username}" not found. Please check your Sleeper username.`;
+      } else if (err.message.includes('network') || err.message.includes('fetch')) {
+        errorMessage = 'Network error. Please check your internet connection and try again.';
+      } else if (err.message.includes('API')) {
+        errorMessage = 'Sleeper API is temporarily unavailable. Please try again later.';
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      
+      setError(errorMessage);
+      console.error('=== LOGIN ERROR END ===');
     } finally {
       setIsLoading(false);
     }

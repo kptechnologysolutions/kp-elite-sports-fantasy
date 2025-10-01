@@ -116,14 +116,40 @@ class SleeperService {
   // Get user by username
   async getUser(username: string): Promise<SleeperUser> {
     console.log(`Fetching user data for: ${username}`);
-    const response = await fetch(`${SLEEPER_BASE_URL}/user/${username}`);
-    if (!response.ok) {
-      console.error(`Failed to fetch user ${username}:`, response.status, response.statusText);
-      throw new Error(`User '${username}' not found. Please check the username spelling.`);
+    
+    // Add timeout to prevent hanging
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+    
+    try {
+      const response = await fetch(`${SLEEPER_BASE_URL}/user/${username}`, {
+        signal: controller.signal,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        }
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (!response.ok) {
+        console.error(`Failed to fetch user ${username}:`, response.status, response.statusText);
+        if (response.status === 404) {
+          throw new Error(`User '${username}' not found. Please check the username spelling.`);
+        }
+        throw new Error(`Failed to fetch user data (${response.status}). Please try again.`);
+      }
+      
+      const userData = await response.json();
+      console.log(`User found:`, userData.display_name);
+      return userData;
+    } catch (error: any) {
+      clearTimeout(timeoutId);
+      if (error.name === 'AbortError') {
+        throw new Error('Request timed out. Please check your internet connection and try again.');
+      }
+      throw error;
     }
-    const userData = await response.json();
-    console.log(`User found:`, userData.display_name);
-    return userData;
   }
   
   // Get user's leagues for current season
