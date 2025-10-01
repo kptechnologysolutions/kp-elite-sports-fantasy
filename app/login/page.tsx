@@ -11,6 +11,26 @@ import { Loader2, UserCircle, AlertCircle } from 'lucide-react';
 import useSleeperStore from '@/lib/store/useSleeperStore';
 import { clearOldStorage } from '@/lib/utils/clearStorage';
 
+// Debugging utilities
+const detectIncognito = async (): Promise<boolean> => {
+  try {
+    const fs = await navigator.storage?.estimate();
+    return fs?.quota && fs.quota < 120000000; // Less than ~120MB suggests incognito
+  } catch {
+    return false;
+  }
+};
+
+const getStorageQuota = async (): Promise<string> => {
+  try {
+    const estimate = await navigator.storage?.estimate();
+    if (estimate?.quota) {
+      return `${Math.round(estimate.quota / 1024 / 1024)}MB`;
+    }
+  } catch {}
+  return 'unknown';
+};
+
 export default function LoginPage() {
   const router = useRouter();
   const [username, setUsername] = useState('');
@@ -55,26 +75,45 @@ export default function LoginPage() {
   
   // Clean up old storage and corrupted data on mount
   useEffect(() => {
+    console.log('=== LOGIN PAGE MOUNT ===');
+    
     try {
       clearOldStorage();
       
       // Clear any potentially corrupted Zustand store data
       const storeData = localStorage.getItem('sleeper-store');
+      console.log('Existing store data:', storeData ? 'exists' : 'none');
+      
       if (storeData) {
         try {
-          JSON.parse(storeData);
+          const parsed = JSON.parse(storeData);
+          console.log('Store data structure:', Object.keys(parsed));
         } catch (e) {
           console.log('Corrupted store data detected, clearing...');
           localStorage.removeItem('sleeper-store');
         }
       }
       
-      // Clear any old authentication state that might be stuck
-      const currentUser = useSleeperStore.getState().user;
-      if (currentUser && !useSleeperStore.getState()._hasHydrated) {
-        console.log('Clearing potentially stuck user state...');
-        useSleeperStore.getState().logout();
-      }
+      // Monitor store hydration
+      const checkHydration = () => {
+        const state = useSleeperStore.getState();
+        console.log('Store hydration status:', {
+          hasHydrated: state._hasHydrated,
+          hasUser: !!state.user,
+          userName: state.user?.display_name
+        });
+        
+        // Clear any old authentication state that might be stuck
+        if (state.user && !state._hasHydrated) {
+          console.log('Clearing potentially stuck user state...');
+          state.logout();
+        }
+      };
+      
+      // Check immediately and after a delay
+      checkHydration();
+      setTimeout(checkHydration, 1000);
+      
     } catch (error) {
       console.error('Error during storage cleanup:', error);
       // Force clear everything if there's an error
@@ -85,6 +124,8 @@ export default function LoginPage() {
         console.error('Failed to clear storage:', e);
       }
     }
+    
+    console.log('=== LOGIN PAGE MOUNT COMPLETE ===');
   }, []);
   
   const handleLogin = async (e: React.FormEvent) => {
@@ -102,11 +143,22 @@ export default function LoginPage() {
       console.log('=== LOGIN ATTEMPT START ===');
       console.log('Username:', username);
       console.log('Store state before login:', useSleeperStore.getState().user);
-      console.log('Environment:', {
+      
+      // Comprehensive environment debugging
+      const envDebug = {
         isDev: process.env.NODE_ENV === 'development',
         userAgent: navigator.userAgent,
-        url: window.location.href
-      });
+        url: window.location.href,
+        isIncognito: await detectIncognito(),
+        cookiesEnabled: navigator.cookieEnabled,
+        storageQuota: await getStorageQuota(),
+        localStorage: typeof localStorage !== 'undefined' ? Object.keys(localStorage) : 'unavailable',
+        sessionStorage: typeof sessionStorage !== 'undefined' ? Object.keys(sessionStorage) : 'unavailable',
+        indexedDB: typeof indexedDB !== 'undefined' ? 'available' : 'unavailable',
+        zustandStore: localStorage.getItem('sleeper-store') ? 'exists' : 'missing'
+      };
+      
+      console.log('Environment:', envDebug);
       
       // Test Sleeper API connectivity first
       console.log('Testing Sleeper API connectivity...');
@@ -121,30 +173,73 @@ export default function LoginPage() {
       }
       
       console.log('Calling login function...');
-      await login(username);
       
-      // Add a small delay to ensure state updates
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Try login with multiple attempts and detailed state checking
+      let loginAttempts = 0;
+      const maxAttempts = 3;
+      let loginSuccess = false;
       
-      // Check if login actually worked
-      const storeAfterLogin = useSleeperStore.getState();
-      console.log('Store state after login:', {
-        user: storeAfterLogin.user,
-        leagues: storeAfterLogin.leagues?.length || 0,
-        isLoading: storeAfterLogin.isLoading,
-        error: storeAfterLogin.error,
-        hasHydrated: storeAfterLogin._hasHydrated
+      while (loginAttempts < maxAttempts && !loginSuccess) {
+        loginAttempts++;
+        console.log(`Login attempt ${loginAttempts}/${maxAttempts}`);
+        
+        try {
+          await login(username);
+          
+          // Progressive delays to ensure state updates
+          for (let i = 0; i < 5; i++) {
+            await new Promise(resolve => setTimeout(resolve, 200));
+            const currentState = useSleeperStore.getState();
+            console.log(`State check ${i + 1}:`, {
+              user: !!currentState.user,
+              userName: currentState.user?.display_name,
+              leagues: currentState.leagues?.length || 0,
+              isLoading: currentState.isLoading,
+              error: currentState.error,
+              hasHydrated: currentState._hasHydrated
+            });
+            
+            if (currentState.user && !currentState.isLoading) {
+              loginSuccess = true;
+              console.log('Login verified successful after', (i + 1) * 200, 'ms');
+              break;
+            }
+          }
+          
+          if (loginSuccess) break;
+          
+        } catch (attemptError: any) {
+          console.error(`Login attempt ${loginAttempts} failed:`, attemptError.message);
+          if (loginAttempts === maxAttempts) {
+            throw attemptError;
+          }
+          // Wait before retry
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+      
+      // Final state check
+      const finalState = useSleeperStore.getState();
+      console.log('Final store state:', {
+        user: finalState.user,
+        leagues: finalState.leagues?.length || 0,
+        isLoading: finalState.isLoading,
+        error: finalState.error,
+        hasHydrated: finalState._hasHydrated,
+        localStorage: localStorage.getItem('sleeper-store') ? 'persisted' : 'not-persisted'
       });
       
-      if (storeAfterLogin.user) {
+      if (finalState.user) {
         console.log('Login successful, redirecting to dashboard...');
+        // Force a small delay before redirect to ensure everything is settled
+        await new Promise(resolve => setTimeout(resolve, 500));
         router.push('/dashboard/sleeper');
-      } else if (storeAfterLogin.error) {
-        console.error('Login failed with store error:', storeAfterLogin.error);
-        setError(storeAfterLogin.error);
+      } else if (finalState.error) {
+        console.error('Login failed with store error:', finalState.error);
+        setError(finalState.error);
       } else {
-        console.error('Login appeared to succeed but no user in store');
-        setError('Login failed - no user data received. Please try again.');
+        console.error('Login failed - no user data after all attempts');
+        setError(`Login failed after ${loginAttempts} attempts. Please try clearing cache and try again.`);
       }
       console.log('=== LOGIN ATTEMPT END ===');
     } catch (err: any) {

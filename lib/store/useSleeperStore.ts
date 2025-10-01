@@ -89,6 +89,13 @@ const useSleeperStore = create<SleeperStore>()(
       login: async (username) => {
         console.log('Store: Starting login process for', username);
         
+        // Force immediate persistence clear to prevent old data interference
+        try {
+          localStorage.removeItem('sleeper-store');
+        } catch (e) {
+          console.warn('Could not clear localStorage:', e);
+        }
+        
         // Clear all existing data first
         set({
           user: null,
@@ -111,10 +118,27 @@ const useSleeperStore = create<SleeperStore>()(
           const user = await sleeperService.getUser(username);
           console.log('Store: User found:', user.display_name, 'ID:', user.user_id);
           
-          // Set user immediately and check if it persisted
+          // Set user immediately and verify it persisted
           set({ user });
+          
+          // Force synchronous check after set
+          await new Promise(resolve => setTimeout(resolve, 50));
+          
           const checkUser = get().user;
           console.log('Store: User set in state:', !!checkUser, checkUser?.display_name);
+          
+          // If user didn't persist, try again with explicit state update
+          if (!checkUser) {
+            console.warn('User state not persisted, retrying...');
+            set(state => ({ ...state, user }));
+            await new Promise(resolve => setTimeout(resolve, 100));
+            const recheckUser = get().user;
+            console.log('Store: User recheck:', !!recheckUser, recheckUser?.display_name);
+            
+            if (!recheckUser) {
+              throw new Error('Failed to persist user state - browser storage may be disabled');
+            }
+          }
           
           // Get leagues
           console.log('Store: Getting leagues...');
@@ -139,7 +163,23 @@ const useSleeperStore = create<SleeperStore>()(
           console.log('Store: Login process completed successfully');
         } catch (error: any) {
           console.error('Store: Login error:', error);
-          set({ error: error.message, user: null });
+          
+          // If storage-related error, try clearing everything and retrying once
+          if (error.message.includes('storage') || error.message.includes('persist')) {
+            console.log('Storage error detected, clearing and retrying...');
+            try {
+              localStorage.clear();
+              sessionStorage.clear();
+              // Don't retry automatically to avoid infinite loops
+              set({ error: 'Storage error. Please refresh the page and try again.', user: null });
+            } catch (clearError) {
+              console.error('Failed to clear storage:', clearError);
+              set({ error: 'Browser storage error. Please clear your cache and try again.', user: null });
+            }
+          } else {
+            set({ error: error.message, user: null });
+          }
+          
           throw error;
         } finally {
           set({ isLoading: false });
