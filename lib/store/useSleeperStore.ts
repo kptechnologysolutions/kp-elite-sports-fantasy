@@ -300,9 +300,46 @@ const useSleeperStore = create<SleeperStore>()(
         currentWeek: state.currentWeek
       }),
       onRehydrateStorage: () => (state) => {
-        console.log('Store rehydrated with state:', !!state?.user);
-        state?.setHasHydrated(true);
-      }
+        try {
+          console.log('Store rehydrated with state:', !!state?.user);
+          state?.setHasHydrated(true);
+        } catch (error) {
+          console.error('Error during store rehydration:', error);
+          // Clear potentially corrupted data
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('sleeper-store');
+          }
+          state?.setHasHydrated(true);
+        }
+      },
+      // Add safe storage that works with SSR
+      storage: {
+        getItem: (name) => {
+          if (typeof window === 'undefined') return null;
+          try {
+            return localStorage.getItem(name);
+          } catch (error) {
+            console.warn('Failed to read from localStorage:', error);
+            return null;
+          }
+        },
+        setItem: (name, value) => {
+          if (typeof window === 'undefined') return;
+          try {
+            localStorage.setItem(name, value);
+          } catch (error) {
+            console.warn('Failed to write to localStorage:', error);
+          }
+        },
+        removeItem: (name) => {
+          if (typeof window === 'undefined') return;
+          try {
+            localStorage.removeItem(name);
+          } catch (error) {
+            console.warn('Failed to remove from localStorage:', error);
+          }
+        },
+      },
     }
   )
 );
