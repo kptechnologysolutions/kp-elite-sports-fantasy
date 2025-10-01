@@ -53,9 +53,17 @@ export default function SleeperDashboard() {
   useEffect(() => {
     if (_hasHydrated && !user) {
       console.log('Dashboard: No user after hydration, redirecting to login');
-      router.push('/login');
+      router.replace('/login');
     } else if (_hasHydrated && user) {
       console.log('Dashboard: User found after hydration:', user.display_name);
+      
+      // Check if we're on an invalid URL (like /dashboard/sleeper/[user_id])
+      // and redirect to the correct dashboard URL
+      const currentPath = window.location.pathname;
+      if (currentPath !== '/dashboard/sleeper' && currentPath.startsWith('/dashboard/sleeper/')) {
+        console.log('Dashboard: Detected invalid URL, redirecting to correct dashboard');
+        router.replace('/dashboard/sleeper');
+      }
     }
   }, [user, router, _hasHydrated]);
   

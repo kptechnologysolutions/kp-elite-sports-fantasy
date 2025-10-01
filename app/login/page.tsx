@@ -233,7 +233,9 @@ export default function LoginPage() {
         console.log('Login successful, redirecting to dashboard...');
         // Force a small delay before redirect to ensure everything is settled
         await new Promise(resolve => setTimeout(resolve, 500));
-        router.push('/dashboard/sleeper');
+        
+        // Use replace instead of push to avoid history issues that might cause URL appending
+        router.replace('/dashboard/sleeper');
       } else if (finalState.error) {
         console.error('Login failed with store error:', finalState.error);
         setError(finalState.error);
