@@ -1,0 +1,284 @@
+{
+  "version": 3,
+  "pages404": true,
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [],
+  "rewrites": {
+    "beforeFiles": [],
+    "afterFiles": [],
+    "fallback": []
+  },
+  "dynamicRoutes": [
+    {
+      "page": "/api/auth/[platform]",
+      "regex": "^/api/auth/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPplatform": "nxtPplatform"
+      },
+      "namedRegex": "^/api/auth/(?<nxtPplatform>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/players/[playerId]",
+      "regex": "^/api/players/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPplayerId": "nxtPplayerId"
+      },
+      "namedRegex": "^/api/players/(?<nxtPplayerId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/players/[playerId]/insights",
+      "regex": "^/api/players/([^/]+?)/insights(?:/)?$",
+      "routeKeys": {
+        "nxtPplayerId": "nxtPplayerId"
+      },
+      "namedRegex": "^/api/players/(?<nxtPplayerId>[^/]+?)/insights(?:/)?$"
+    },
+    {
+      "page": "/api/players/[playerId]/news",
+      "regex": "^/api/players/([^/]+?)/news(?:/)?$",
+      "routeKeys": {
+        "nxtPplayerId": "nxtPplayerId"
+      },
+      "namedRegex": "^/api/players/(?<nxtPplayerId>[^/]+?)/news(?:/)?$"
+    },
+    {
+      "page": "/api/teams/[teamId]",
+      "regex": "^/api/teams/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPteamId": "nxtPteamId"
+      },
+      "namedRegex": "^/api/teams/(?<nxtPteamId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/matchup/[teamId]",
+      "regex": "^/matchup/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPteamId": "nxtPteamId"
+      },
+      "namedRegex": "^/matchup/(?<nxtPteamId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/players/[playerId]",
+      "regex": "^/players/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPplayerId": "nxtPplayerId"
+      },
+      "namedRegex": "^/players/(?<nxtPplayerId>[^/]+?)(?:/)?$"
+    }
+  ],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/admin",
+      "regex": "^/admin(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin(?:/)?$"
+    },
+    {
+      "page": "/coach",
+      "regex": "^/coach(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/coach(?:/)?$"
+    },
+    {
+      "page": "/dashboard",
+      "regex": "^/dashboard(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard(?:/)?$"
+    },
+    {
+      "page": "/dashboard/redesigned",
+      "regex": "^/dashboard/redesigned(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/redesigned(?:/)?$"
+    },
+    {
+      "page": "/dashboard/sleeper",
+      "regex": "^/dashboard/sleeper(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/sleeper(?:/)?$"
+    },
+    {
+      "page": "/dashboard/tecmo",
+      "regex": "^/dashboard/tecmo(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/tecmo(?:/)?$"
+    },
+    {
+      "page": "/dynasty",
+      "regex": "^/dynasty(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dynasty(?:/)?$"
+    },
+    {
+      "page": "/favicon.ico",
+      "regex": "^/favicon\\.ico(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/favicon\\.ico(?:/)?$"
+    },
+    {
+      "page": "/gameday",
+      "regex": "^/gameday(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/gameday(?:/)?$"
+    },
+    {
+      "page": "/login",
+      "regex": "^/login(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/login(?:/)?$"
+    },
+    {
+      "page": "/matchups",
+      "regex": "^/matchups(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/matchups(?:/)?$"
+    },
+    {
+      "page": "/players",
+      "regex": "^/players(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/players(?:/)?$"
+    },
+    {
+      "page": "/portfolio",
+      "regex": "^/portfolio(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/portfolio(?:/)?$"
+    },
+    {
+      "page": "/roster",
+      "regex": "^/roster(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/roster(?:/)?$"
+    },
+    {
+      "page": "/roster/sleeper",
+      "regex": "^/roster/sleeper(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/roster/sleeper(?:/)?$"
+    },
+    {
+      "page": "/scores",
+      "regex": "^/scores(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/scores(?:/)?$"
+    },
+    {
+      "page": "/settings",
+      "regex": "^/settings(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/settings(?:/)?$"
+    },
+    {
+      "page": "/stats/sleeper",
+      "regex": "^/stats/sleeper(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/stats/sleeper(?:/)?$"
+    },
+    {
+      "page": "/team-import",
+      "regex": "^/team\\-import(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/team\\-import(?:/)?$"
+    },
+    {
+      "page": "/teams",
+      "regex": "^/teams(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/teams(?:/)?$"
+    },
+    {
+      "page": "/teams/import",
+      "regex": "^/teams/import(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/teams/import(?:/)?$"
+    },
+    {
+      "page": "/teams/import/yahoo/select",
+      "regex": "^/teams/import/yahoo/select(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/teams/import/yahoo/select(?:/)?$"
+    },
+    {
+      "page": "/teams/import/yahoo/setup",
+      "regex": "^/teams/import/yahoo/setup(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/teams/import/yahoo/setup(?:/)?$"
+    },
+    {
+      "page": "/teams/manage",
+      "regex": "^/teams/manage(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/teams/manage(?:/)?$"
+    },
+    {
+      "page": "/trade-center",
+      "regex": "^/trade\\-center(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/trade\\-center(?:/)?$"
+    },
+    {
+      "page": "/trades",
+      "regex": "^/trades(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/trades(?:/)?$"
+    },
+    {
+      "page": "/trades/sleeper",
+      "regex": "^/trades/sleeper(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/trades/sleeper(?:/)?$"
+    },
+    {
+      "page": "/waiver-wire",
+      "regex": "^/waiver\\-wire(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/waiver\\-wire(?:/)?$"
+    },
+    {
+      "page": "/waivers/sleeper",
+      "regex": "^/waivers/sleeper(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/waivers/sleeper(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "rsc",
+    "varyHeader": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+    "prefetchHeader": "next-router-prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSuffix": ".prefetch.rsc",
+    "prefetchSegmentHeader": "next-router-segment-prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments"
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  }
+}

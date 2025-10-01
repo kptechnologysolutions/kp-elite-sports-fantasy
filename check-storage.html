@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Check Storage</title>
+</head>
+<body>
+    <h1>LocalStorage Team Data</h1>
+    <pre id="output"></pre>
+    
+    <script>
+        const teams = localStorage.getItem('fantasyTeams');
+        if (teams) {
+            const parsed = JSON.parse(teams);
+            document.getElementById('output').textContent = JSON.stringify(parsed, null, 2);
+            
+            // Log the first team's live score
+            if (parsed.length > 0) {
+                console.log('First team live score:', parsed[0].liveScore);
+            }
+        } else {
+            document.getElementById('output').textContent = 'No teams found in localStorage';
+        }
+    </script>
+</body>
+</html>

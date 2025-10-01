@@ -1,0 +1,23 @@
+{
+  "pages": {
+    "/trades/sleeper/page": [
+      "static/chunks/ff1a16fafef87110.js",
+      "static/chunks/7dd66bdf8a7e5707.js",
+      "static/chunks/2473c16c0c2f6b5f.css",
+      "static/chunks/eab8b729869428ed.css",
+      "static/chunks/50c24234a1ae29cb.js",
+      "static/chunks/e059d08753a76438.js",
+      "static/chunks/2e569fe2d396a2c3.js",
+      "static/chunks/21c29ec1c1c488cf.js",
+      "static/chunks/d39dd3d4a7aacc7e.js",
+      "static/chunks/8b3f39957a70241c.js",
+      "static/chunks/7b26c0eb64d288e8.js",
+      "static/chunks/e0eb8ae8ea794d9f.js",
+      "static/chunks/0510c6ddd915e838.js",
+      "static/chunks/30cb146bc1e6f45f.js",
+      "static/chunks/8082ab48faca5ea1.js",
+      "static/chunks/f8a73d355eff1bc5.js",
+      "static/chunks/turbopack-c9033b0b055877d6.js"
+    ]
+  }
+}

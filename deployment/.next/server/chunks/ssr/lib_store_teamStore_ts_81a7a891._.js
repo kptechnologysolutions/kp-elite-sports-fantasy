@@ -1,0 +1,3 @@
+module.exports=[26788,a=>{"use strict";a.s(["default",()=>c,"useTeamStore",()=>d]);var b=a.i(72131);let c=null;function d(){let[a,c]=b.default.useState([]),[d,e]=b.default.useState(null),[f,g]=b.default.useState(!0);return b.default.useEffect(()=>{g(!1)},[]),{teams:a,currentTeamId:d,currentTeam:a.find(a=>a.id===d),loading:f,addTeam:a=>{},updateTeam:(a,b)=>{},removeTeam:a=>{},clearAllTeams:()=>{},setCurrentTeam:a=>{},importTeamFromAPI:(a,b)=>null,clearAll:()=>{}}}}];
+
+//# sourceMappingURL=lib_store_teamStore_ts_81a7a891._.js.map

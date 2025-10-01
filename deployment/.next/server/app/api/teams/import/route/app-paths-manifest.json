@@ -1,0 +1,3 @@
+{
+  "/api/teams/import/route": "app/api/teams/import/route.js"
+}

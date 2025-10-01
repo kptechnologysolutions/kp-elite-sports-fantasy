@@ -1,0 +1,86 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f172a;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#1e293b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#334155;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#8b5cf6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGradient)"/>
+  
+  <!-- Grid Pattern -->
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#ffffff" stroke-width="0.5" opacity="0.1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  
+  <!-- Main Logo/Icon -->
+  <g transform="translate(100, 150)">
+    <!-- Logo Background Circle -->
+    <circle cx="80" cy="80" r="70" fill="url(#logoGradient)" opacity="0.9"/>
+    <circle cx="80" cy="80" r="50" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.3"/>
+    
+    <!-- KP Letters -->
+    <text x="80" y="95" font-family="Arial, sans-serif" font-size="42" font-weight="bold" fill="white" text-anchor="middle">KP</text>
+    
+    <!-- Pulsing dot -->
+    <circle cx="130" cy="50" r="8" fill="#10b981">
+      <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+  
+  <!-- Main Title -->
+  <text x="320" y="240" font-family="Arial, sans-serif" font-size="64" font-weight="bold" fill="url(#textGradient)">
+    KP Elite Sports
+  </text>
+  
+  <!-- Subtitle -->
+  <text x="320" y="290" font-family="Arial, sans-serif" font-size="32" font-weight="normal" fill="#94a3b8">
+    Fantasy Football AI Analytics
+  </text>
+  
+  <!-- Feature List -->
+  <g transform="translate(320, 340)">
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="24" font-weight="600" fill="#e2e8f0">
+      ⚡ Real-time Sleeper Integration
+    </text>
+    <text x="0" y="40" font-family="Arial, sans-serif" font-size="24" font-weight="600" fill="#e2e8f0">
+      🎯 AI-Powered Lineup Optimization
+    </text>
+    <text x="0" y="80" font-family="Arial, sans-serif" font-size="24" font-weight="600" fill="#e2e8f0">
+      📊 Multi-League Portfolio Analysis
+    </text>
+    <text x="0" y="120" font-family="Arial, sans-serif" font-size="24" font-weight="600" fill="#e2e8f0">
+      🎮 Retro Tecmo Bowl Theme
+    </text>
+  </g>
+  
+  <!-- Bottom Brand -->
+  <text x="600" y="580" font-family="Arial, sans-serif" font-size="18" font-weight="normal" fill="#64748b" text-anchor="middle">
+    Advanced Fantasy Football Analytics Platform
+  </text>
+  
+  <!-- Decorative Elements -->
+  <g opacity="0.6">
+    <!-- Top right decorative circle -->
+    <circle cx="1050" cy="100" r="60" fill="none" stroke="url(#logoGradient)" stroke-width="2" opacity="0.4"/>
+    <circle cx="1050" cy="100" r="40" fill="none" stroke="url(#logoGradient)" stroke-width="1" opacity="0.6"/>
+    
+    <!-- Bottom left decorative -->
+    <circle cx="150" cy="530" r="40" fill="none" stroke="#10b981" stroke-width="2" opacity="0.4"/>
+    <circle cx="150" cy="530" r="25" fill="none" stroke="#10b981" stroke-width="1" opacity="0.6"/>
+  </g>
+</svg>
