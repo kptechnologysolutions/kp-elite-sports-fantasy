@@ -14,6 +14,11 @@ import {
   RosterAnalysis
 } from '@/lib/services/teamPersonalizedService';
 import { 
+  enhancedInsightsService,
+  EnhancedPlayerInsights,
+  EnhancedWaiverInsights
+} from '@/lib/services/enhancedInsightsService';
+import { 
   advancedTeamStrategy,
   ContextualRecommendation,
   ContextualWaiverTarget,
@@ -154,12 +159,45 @@ export function PersonalizedRecommendations() {
       currentLeague
     );
 
+    // Generate enhanced insights with detailed reasoning
+    const enhancedMustStarts = enhancedInsightsService.generateMustStartInsights(
+      myRoster,
+      players,
+      currentLeague,
+      currentWeek
+    );
+
+    const enhancedDecisions = enhancedInsightsService.generateKeyDecisionInsights(
+      myRoster,
+      players,
+      currentLeague,
+      currentWeek
+    );
+
+
+    // Get available players for enhanced waiver analysis
+    const availablePlayersForWaivers = Array.from(players.values())
+      .filter(p => !myRoster.players.includes(p.player_id))
+      .slice(0, 30);
+
+    const enhancedWaivers = enhancedInsightsService.generateEnhancedWaiverTargets(
+      availablePlayersForWaivers,
+      myRoster,
+      players,
+      currentLeague,
+      currentWeek
+    );
+
     return {
       roster: rosterAnalysis,
       teamSituation,
       weeklyStrategy,
       startSit: contextualStartSit,
-      waivers: contextualWaivers.slice(0, 10)
+      waivers: contextualWaivers.slice(0, 10),
+      // Enhanced insights with detailed reasoning
+      enhancedMustStarts,
+      enhancedDecisions,
+      enhancedWaivers: enhancedWaivers.slice(0, 10)
     };
   }, [myRoster, players, currentLeague, currentMatchups, seasonMatchups, currentWeek, rosters]);
 
@@ -229,6 +267,8 @@ export function PersonalizedRecommendations() {
         startSit={analysis.startSit}
         waivers={analysis.waivers}
         teamSituation={analysis.teamSituation}
+        enhancedMustStarts={analysis.enhancedMustStarts}
+        enhancedDecisions={analysis.enhancedDecisions}
       />
 
       {/* SENIOR UI REDESIGN: Detailed Tabs Below */}
@@ -265,26 +305,38 @@ export function PersonalizedRecommendations() {
 function QuickActionSummary({ 
   startSit, 
   waivers,
-  teamSituation 
+  teamSituation,
+  enhancedMustStarts,
+  enhancedDecisions
 }: { 
   startSit: ContextualRecommendation[] | PersonalizedStartSitRecommendation[];
   waivers: ContextualWaiverTarget[] | PersonalizedWaiverTarget[];
   teamSituation: TeamSituationContext;
+  enhancedMustStarts?: EnhancedPlayerInsights[];
+  enhancedDecisions?: EnhancedPlayerInsights[];
 }) {
   const [expandedCard, setExpandedCard] = useState<'starts' | 'decisions' | 'waivers' | null>(null);
-  const mustStarts = startSit.filter(r => r.recommendation === 'must_start');
-  const decisions = startSit.filter(r => ['strong_start', 'flex_play', 'sit'].includes(r.recommendation));
+  
+  // Use enhanced insights if available, otherwise fall back to regular analysis
+  const mustStarts = enhancedMustStarts?.length > 0 
+    ? enhancedMustStarts.filter(r => r.recommendation === 'must_start')
+    : startSit.filter(r => r.recommendation === 'must_start');
+  
+  const decisions = enhancedDecisions?.length > 0
+    ? enhancedDecisions.filter(r => ['strong_start', 'flex_play', 'sit'].includes(r.recommendation))
+    : startSit.filter(r => ['strong_start', 'flex_play', 'sit'].includes(r.recommendation));
+    
   const topWaivers = waivers.slice(0, 3);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      {/* Must Starts Card - ULTIMATE UI with Hover & Animations */}
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      {/* Must Starts Card - Updated Theme Colors */}
       <Card 
-        className="border-2 border-emerald-400 bg-gradient-to-br from-emerald-500 to-green-600 text-white shadow-2xl hover:shadow-emerald-500/50 transform hover:-translate-y-2 transition-all duration-300 cursor-pointer group"
+        className="border-2 border-[#00C851] bg-gradient-to-br from-[#004B87] to-[#1A1F2E] text-white shadow-2xl hover:shadow-[#00C851]/50 transform hover:-translate-y-2 transition-all duration-300 cursor-pointer group"
         onClick={() => setExpandedCard(expandedCard === 'starts' ? null : 'starts')}
       >
         <CardHeader className="pb-3">
-          <CardTitle className="text-2xl flex items-center gap-3 font-black tracking-tight">
+          <CardTitle className="text-xl sm:text-2xl flex items-center gap-2 sm:gap-3 font-black tracking-tight">
             <div className="relative">
               <CheckCircle className="h-7 w-7 animate-pulse" />
               <div className="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full animate-ping"></div>
@@ -297,39 +349,112 @@ function QuickActionSummary({
         </CardHeader>
         <CardContent className="space-y-3">
           {mustStarts.slice(0, 3).map((rec, idx) => (
-            <div key={rec.player.player_id} className="flex items-center justify-between bg-white/20 hover:bg-white/30 rounded-lg p-3 transition-all duration-200 hover:scale-105">
-              <div className="flex items-center gap-3">
-                <div className="text-2xl">{getPositionEmoji(rec.player.position)}</div>
-                <div>
-                  <span className="font-black text-white text-xl tracking-wide leading-tight">{rec.player.full_name}</span>
-                  <div className="text-emerald-100 text-sm font-medium opacity-80">{rec.player.team}</div>
+            <div key={rec.player.player_id} className="flex flex-col bg-[#242B3D]/60 hover:bg-[#242B3D]/80 rounded-lg p-3 transition-all duration-200 hover:scale-105">
+              <div className="flex items-start sm:items-center justify-between mb-2 gap-2">
+                <div className="flex items-center gap-3">
+                  <div className="text-2xl">{getPositionEmoji(rec.player.position)}</div>
+                  <div>
+                    <span className="font-black text-white text-lg sm:text-xl tracking-wide leading-tight">{rec.player.full_name}</span>
+                    <div className="text-[#B8BCC8] text-sm font-medium opacity-90">
+                      {rec.player.team}
+                      {/* Show enhanced matchup grade if available */}
+                      {'keyFactors' in rec && rec.keyFactors?.matchupGrade && (
+                        <span className="ml-2 px-1 py-0.5 bg-[#242B3D]/80 rounded text-xs">
+                          {rec.keyFactors.matchupGrade} Matchup
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <Badge className="bg-[#00C851] text-white font-bold text-xs sm:text-sm px-2 sm:px-3 py-1 animate-bounce">
+                    {'confidence' in rec ? `${rec.confidence}%` : rec.player.position}
+                  </Badge>
+                  <div className="w-2 h-2 bg-[#00C851] rounded-full animate-pulse"></div>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Badge className="bg-white text-emerald-700 font-bold text-sm px-3 py-1 animate-bounce">
-                  {rec.player.position}
-                </Badge>
-                <div className="w-2 h-2 bg-green-300 rounded-full animate-pulse"></div>
-              </div>
+              
+              {/* Show enhanced reasoning if available */}
+              {'whyThisPlayer' in rec && rec.whyThisPlayer && (
+                <div className="space-y-1 mt-2">
+                  <div className="text-[#B8BCC8] text-xs font-medium">
+                    💡 {rec.whyThisPlayer.primaryReason}
+                  </div>
+                  {rec.whyThisPlayer.keyStatistic && (
+                    <div className="text-[#B8BCC8] text-xs opacity-80">
+                      📊 {rec.whyThisPlayer.keyStatistic}
+                    </div>
+                  )}
+                  {rec.whyThisPlayer.supportingFactors.length > 0 && (
+                    <div className="text-[#B8BCC8] text-xs opacity-75">
+                      ✓ {rec.whyThisPlayer.supportingFactors[0]}
+                    </div>
+                  )}
+                </div>
+              )}
+              
+              {/* Show basic reasoning for regular recommendations */}
+              {'reasoning' in rec && rec.reasoning && rec.reasoning.length > 0 && !('whyThisPlayer' in rec) && (
+                <div className="text-[#B8BCC8] text-xs opacity-90 mt-1">
+                  💡 {rec.reasoning[0]}
+                </div>
+              )}
             </div>
           ))}
-          {mustStarts.length > 3 && !expandedCard && (
-            <div className="text-emerald-100 font-bold text-center bg-white/10 rounded-lg p-2">
+          {mustStarts.length > 3 && expandedCard !== 'starts' && (
+            <div className="text-[#B8BCC8] font-bold text-center bg-[#242B3D]/40 rounded-lg p-2">
               ⭐ +{mustStarts.length - 3} more stars to start
             </div>
           )}
           
           {/* Expanded Details */}
-          {expandedCard === 'starts' && mustStarts.length > 3 && (
-            <div className="space-y-2 border-t border-white/20 pt-3 animate-in slide-in-from-top-2 duration-300">
-              <div className="text-emerald-100 font-bold text-sm mb-2">⭐ All Must-Start Players:</div>
-              {mustStarts.slice(3).map((rec, idx) => (
-                <div key={rec.player.player_id} className="flex items-center justify-between bg-white/10 rounded-lg p-2 text-sm">
-                  <div className="flex items-center gap-2">
-                    <div className="text-lg">{getPositionEmoji(rec.player.position)}</div>
-                    <span className="font-bold">{rec.player.full_name}</span>
+          {expandedCard === 'starts' && (
+            <div className="space-y-3 border-t border-[#242B3D]/60 pt-3 animate-in slide-in-from-top-2 duration-300">
+              <div className="text-[#B8BCC8] font-bold text-sm mb-2">⭐ Detailed Analysis:</div>
+              
+              {/* Show all must starts with enhanced details */}
+              {mustStarts.map((rec, idx) => (
+                <div key={rec.player.player_id} className="bg-[#242B3D]/40 rounded-lg p-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="text-lg">{getPositionEmoji(rec.player.position)}</div>
+                      <span className="font-bold">{rec.player.full_name}</span>
+                    </div>
+                    <div className="text-[#B8BCC8] text-xs">{rec.confidence}% confident</div>
                   </div>
-                  <div className="text-emerald-200 text-xs">{rec.confidence}% confident</div>
+                  
+                  {/* Enhanced details if available */}
+                  {'keyFactors' in rec && rec.keyFactors && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                      {rec.keyFactors.matchupGrade && (
+                        <div className="text-[#00C851]">
+                          📊 Matchup: {rec.keyFactors.matchupGrade}
+                        </div>
+                      )}
+                      {rec.keyFactors.volumeExpectation && (
+                        <div className="text-[#00C851]">
+                          🎯 Volume: {rec.keyFactors.volumeExpectation}
+                        </div>
+                      )}
+                      {rec.keyFactors.recentForm && (
+                        <div className="text-[#00C851]">
+                          📈 Form: {rec.keyFactors.recentForm}
+                        </div>
+                      )}
+                      {rec.keyFactors.injuryRisk && (
+                        <div className="text-[#00C851]">
+                          🏥 Injury: {rec.keyFactors.injuryRisk}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  
+                  {/* Reasoning */}
+                  {'reasoning' in rec && rec.reasoning && rec.reasoning.length > 0 && (
+                    <div className="text-[#B8BCC8] text-xs opacity-90">
+                      💭 {rec.reasoning.slice(0, 2).join(' • ')}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -337,13 +462,13 @@ function QuickActionSummary({
         </CardContent>
       </Card>
 
-      {/* Decisions Needed Card - ULTIMATE UI with Hover & Animations */}
+      {/* Decisions Needed Card - Updated Theme Colors */}
       <Card 
-        className="border-2 border-amber-400 bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-xl hover:shadow-amber-500/50 transform hover:-translate-y-2 transition-all duration-300 cursor-pointer group"
+        className="border-2 border-[#FFB300] bg-gradient-to-br from-[#004B87] to-[#1A1F2E] text-white shadow-xl hover:shadow-[#FFB300]/50 transform hover:-translate-y-2 transition-all duration-300 cursor-pointer group"
         onClick={() => setExpandedCard(expandedCard === 'decisions' ? null : 'decisions')}
       >
         <CardHeader className="pb-3">
-          <CardTitle className="text-2xl flex items-center gap-3 font-black tracking-tight">
+          <CardTitle className="text-xl sm:text-2xl flex items-center gap-2 sm:gap-3 font-black tracking-tight">
             <div className="relative">
               <Clock className="h-7 w-7 animate-spin" />
               <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-300 rounded-full animate-ping"></div>
@@ -356,35 +481,151 @@ function QuickActionSummary({
         </CardHeader>
         <CardContent className="space-y-3">
           {decisions.slice(0, 3).map((rec, idx) => (
-            <div key={rec.player.player_id} className="flex items-center justify-between bg-white/20 hover:bg-white/30 rounded-lg p-3 transition-all duration-200 hover:scale-105">
-              <div className="flex items-center gap-3">
-                <div className="text-2xl">{getPositionEmoji(rec.player.position)}</div>
-                <div>
-                  <span className="font-black text-white text-xl tracking-wide leading-tight">{rec.player.full_name}</span>
-                  <div className="text-emerald-100 text-sm font-medium opacity-80">{rec.player.team}</div>
+            <div key={rec.player.player_id} className="flex flex-col bg-[#242B3D]/60 hover:bg-[#242B3D]/80 rounded-lg p-3 transition-all duration-200 hover:scale-105">
+              <div className="flex items-start sm:items-center justify-between mb-2 gap-2">
+                <div className="flex items-center gap-3">
+                  <div className="text-2xl">{getPositionEmoji(rec.player.position)}</div>
+                  <div>
+                    <span className="font-black text-white text-lg sm:text-xl tracking-wide leading-tight">{rec.player.full_name}</span>
+                    <div className="text-[#B8BCC8] text-sm font-medium opacity-90">
+                      {rec.player.team}
+                      {/* Show enhanced matchup grade if available */}
+                      {'keyFactors' in rec && rec.keyFactors?.matchupGrade && (
+                        <span className="ml-2 px-1 py-0.5 bg-[#242B3D]/80 rounded text-xs">
+                          {rec.keyFactors.matchupGrade} Matchup
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge 
+                    className={`font-bold text-sm px-3 py-1 ${
+                      rec.recommendation === 'strong_start' ? 'bg-[#00C851] text-white animate-pulse' :
+                      rec.recommendation === 'flex_play' ? 'bg-[#FFB300] text-black animate-bounce' :
+                      'bg-[#6B7280] text-white'
+                    }`}
+                  >
+                    {rec.recommendation === 'strong_start' ? '🚀 START' :
+                     rec.recommendation === 'flex_play' ? '🤔 FLEX' : '🚫 SIT'}
+                  </Badge>
+                  {'confidence' in rec && (
+                    <Badge className="bg-[#242B3D]/60 text-white text-xs">
+                      {rec.confidence}%
+                    </Badge>
+                  )}
+                  <div className={`w-2 h-2 rounded-full animate-pulse ${
+                    rec.recommendation === 'strong_start' ? 'bg-[#00C851]' :
+                    rec.recommendation === 'flex_play' ? 'bg-[#FFB300]' : 'bg-[#6B7280]'
+                  }`}></div>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Badge 
-                  className={`font-bold text-sm px-3 py-1 ${
-                    rec.recommendation === 'strong_start' ? 'bg-green-500 text-white animate-pulse' :
-                    rec.recommendation === 'flex_play' ? 'bg-yellow-500 text-black animate-bounce' :
-                    'bg-gray-500 text-white'
-                  }`}
-                >
-                  {rec.recommendation === 'strong_start' ? '🚀 START' :
-                   rec.recommendation === 'flex_play' ? '🤔 FLEX' : '🚫 SIT'}
-                </Badge>
-                <div className={`w-2 h-2 rounded-full animate-pulse ${
-                  rec.recommendation === 'strong_start' ? 'bg-green-300' :
-                  rec.recommendation === 'flex_play' ? 'bg-yellow-300' : 'bg-gray-300'
-                }`}></div>
-              </div>
+              
+              {/* Show enhanced reasoning if available */}
+              {'whyThisPlayer' in rec && rec.whyThisPlayer && (
+                <div className="space-y-1 mt-2">
+                  <div className="text-[#B8BCC8] text-xs font-medium">
+                    💡 {rec.whyThisPlayer.primaryReason}
+                  </div>
+                  {rec.whyThisPlayer.keyStatistic && (
+                    <div className="text-[#B8BCC8] text-xs opacity-80">
+                      📊 {rec.whyThisPlayer.keyStatistic}
+                    </div>
+                  )}
+                  {rec.whyThisPlayer.supportingFactors.length > 0 && (
+                    <div className="text-[#B8BCC8] text-xs opacity-75">
+                      ✓ {rec.whyThisPlayer.supportingFactors[0]}
+                    </div>
+                  )}
+                  {rec.whyThisPlayer.concernsToMonitor.length > 0 && (
+                    <div className="text-[#FFB300] text-xs opacity-90">
+                      ⚠️ {rec.whyThisPlayer.concernsToMonitor[0]}
+                    </div>
+                  )}
+                </div>
+              )}
+              
+              {/* Show basic reasoning for regular recommendations */}
+              {'reasoning' in rec && rec.reasoning && rec.reasoning.length > 0 && !('whyThisPlayer' in rec) && (
+                <div className="text-[#B8BCC8] text-xs opacity-90 mt-1">
+                  💡 {rec.reasoning[0]}
+                </div>
+              )}
             </div>
           ))}
-          {decisions.length > 3 && (
-            <div className="text-amber-100 font-bold text-center bg-white/10 rounded-lg p-2">
+          {decisions.length > 3 && expandedCard !== 'decisions' && (
+            <div className="text-[#B8BCC8] font-bold text-center bg-[#242B3D]/40 rounded-lg p-2">
               🤔 +{decisions.length - 3} more decisions to make
+            </div>
+          )}
+          
+          {/* Expanded Details for Decisions */}
+          {expandedCard === 'decisions' && (
+            <div className="space-y-3 border-t border-[#242B3D]/60 pt-3 animate-in slide-in-from-top-2 duration-300">
+              <div className="text-[#B8BCC8] font-bold text-sm mb-2">🤔 Detailed Decision Analysis:</div>
+              
+              {/* Show all decisions with enhanced details */}
+              {decisions.map((rec, idx) => (
+                <div key={rec.player.player_id} className="bg-[#242B3D]/40 rounded-lg p-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="text-lg">{getPositionEmoji(rec.player.position)}</div>
+                      <span className="font-bold">{rec.player.full_name}</span>
+                      <Badge 
+                        className={`text-xs ${
+                          rec.recommendation === 'strong_start' ? 'bg-[#00C851] text-white' :
+                          rec.recommendation === 'flex_play' ? 'bg-[#FFB300] text-black' :
+                          'bg-[#6B7280] text-white'
+                        }`}
+                      >
+                        {rec.recommendation === 'strong_start' ? 'START' :
+                         rec.recommendation === 'flex_play' ? 'FLEX' : 'SIT'}
+                      </Badge>
+                    </div>
+                    <div className="text-[#B8BCC8] text-xs">{rec.confidence}% confident</div>
+                  </div>
+                  
+                  {/* Enhanced details if available */}
+                  {'keyFactors' in rec && rec.keyFactors && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                      {rec.keyFactors.matchupGrade && (
+                        <div className="text-[#FFB300]">
+                          📊 Matchup: {rec.keyFactors.matchupGrade}
+                        </div>
+                      )}
+                      {rec.keyFactors.volumeExpectation && (
+                        <div className="text-[#FFB300]">
+                          🎯 Volume: {rec.keyFactors.volumeExpectation}
+                        </div>
+                      )}
+                      {rec.keyFactors.recentForm && (
+                        <div className="text-[#FFB300]">
+                          📈 Form: {rec.keyFactors.recentForm}
+                        </div>
+                      )}
+                      {rec.keyFactors.gameScript && (
+                        <div className="text-[#FFB300]">
+                          🎮 Script: {rec.keyFactors.gameScript}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  
+                  {/* Reasoning */}
+                  {'reasoning' in rec && rec.reasoning && rec.reasoning.length > 0 && (
+                    <div className="text-[#B8BCC8] text-xs opacity-90">
+                      💭 {rec.reasoning.slice(0, 2).join(' • ')}
+                    </div>
+                  )}
+                  
+                  {/* Concerns if available */}
+                  {'whyThisPlayer' in rec && rec.whyThisPlayer?.concernsToMonitor.length > 0 && (
+                    <div className="text-[#FF3547] text-xs opacity-90">
+                      ⚠️ Watch: {rec.whyThisPlayer.concernsToMonitor[0]}
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           )}
         </CardContent>
@@ -393,7 +634,7 @@ function QuickActionSummary({
       {/* Priority Waivers Card - ULTIMATE UI with Hover & Animations */}
       <Card className="border-2 border-blue-400 bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-xl hover:shadow-blue-500/50 transform hover:-translate-y-2 transition-all duration-300 cursor-pointer group">
         <CardHeader className="pb-3">
-          <CardTitle className="text-2xl flex items-center gap-3 font-black tracking-tight">
+          <CardTitle className="text-xl sm:text-2xl flex items-center gap-2 sm:gap-3 font-black tracking-tight">
             <div className="relative">
               <Target className="h-7 w-7 animate-pulse" />
               <div className="absolute -top-1 -right-1 w-3 h-3 bg-cyan-300 rounded-full animate-ping"></div>

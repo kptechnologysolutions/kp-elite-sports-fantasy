@@ -12,6 +12,7 @@ import {
   LeagueUser
 } from '@/lib/services/sleeperService';
 import { scoringService } from '@/lib/services/scoringService';
+import { userTrackingService } from '@/lib/services/userTrackingService';
 
 interface SleeperStore {
   // User data
@@ -128,6 +129,10 @@ const useSleeperStore = create<SleeperStore>()(
           const user = await sleeperService.getUser(username);
           console.log('Store: User found:', user.display_name, 'ID:', user.user_id);
           
+          // Initialize user tracking
+          await userTrackingService.initializeUser(username, user.user_id);
+          console.log('📊 User tracking initialized for:', username);
+          
           // Set user immediately and verify it persisted
           set({ user });
           
@@ -229,6 +234,17 @@ const useSleeperStore = create<SleeperStore>()(
           console.log('Store: League scoring info:', leagueScoring);
           
           set({ currentLeague: league, leagueScoring });
+          
+          // Track league join/selection
+          if (user) {
+            await userTrackingService.trackLeagueJoin(user.user_id, {
+              leagueId: league.league_id,
+              leagueName: league.name,
+              season: league.season,
+              rosterId: user.user_id, // Will be updated with actual roster ID below
+              teamName: league.name // Will be updated with actual team name below
+            });
+          }
           
           // Get NFL state for current week
           console.log('Store: Getting NFL state...');

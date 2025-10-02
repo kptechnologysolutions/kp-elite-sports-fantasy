@@ -34,11 +34,25 @@ export interface PersonalizedStartSitRecommendation {
   recommendation: 'must_start' | 'strong_start' | 'flex_play' | 'sit' | 'avoid';
   confidence: number; // 0-100
   reasoning: string[];
+  detailedInsights: {
+    matchupAnalysis: string;
+    weatherImpact?: string;
+    injuryContext?: string;
+    recentPerformance: string;
+    opposingDefenseRank: number;
+    projectedTargetsOrCarries: number;
+    gameScript: 'positive' | 'neutral' | 'negative';
+    sleepRisk: 'low' | 'medium' | 'high';
+    ceilingPlay: boolean;
+    floorPlay: boolean;
+  };
   alternativeOptions: SleeperPlayer[];
   positionContext: {
     yourDepthAtPosition: number;
     betterOptionsOnBench: boolean;
     isYourBestOption: boolean;
+    positionStrength: 'elite' | 'strong' | 'average' | 'weak' | 'dire';
+    needsUpgrade: boolean;
   };
 }
 
@@ -46,6 +60,16 @@ export interface PersonalizedWaiverTarget {
   player: SleeperPlayer;
   priority: 'critical_need' | 'upgrade' | 'depth' | 'lottery_ticket' | 'ignore';
   reasoning: string[];
+  detailedAnalysis: {
+    whyAvailable: string;
+    opportunityContext: string;
+    rosterFit: string;
+    timelineToImpact: string;
+    competitionLevel: 'low' | 'medium' | 'high';
+    injuryUpside: boolean;
+    scheduleStrength: number; // 1-10
+    marketTrend: 'rising' | 'stable' | 'falling';
+  };
   expectedImpact: 'immediate_starter' | 'flex_upgrade' | 'depth_piece' | 'future_value';
   bidRecommendation: {
     faabPercent: number;

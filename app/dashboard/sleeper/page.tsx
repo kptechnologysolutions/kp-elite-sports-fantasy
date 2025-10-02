@@ -21,6 +21,7 @@ import { AdvancedAnalytics } from '@/components/dashboard/AdvancedAnalytics';
 import { PerformanceWidget } from '@/components/dashboard/PerformanceWidget';
 import { CommandCenterRecommendations } from '@/components/recommendations/CommandCenterRecommendations';
 import { EnhancedRecommendationsUI } from '@/components/recommendations/EnhancedRecommendationsUI';
+import { EnhancedPersonalizedRecommendations } from '@/components/recommendations/EnhancedPersonalizedRecommendations';
 import { 
   Trophy, TrendingUp, Users, Activity, RefreshCw, 
   CheckCircle2, Clock, AlertTriangle, Star, AlertCircle, Swords
@@ -314,7 +315,7 @@ export default function SleeperDashboard() {
             </TabsList>
             
             <TabsContent value="recommendations">
-              <CommandCenterRecommendations />
+              <EnhancedPersonalizedRecommendations />
             </TabsContent>
             
             <TabsContent value="roster">

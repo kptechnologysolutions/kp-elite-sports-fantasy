@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Logo PNG</title>
+</head>
+<body>
+    <canvas id="canvas" width="1200" height="630" style="border: 1px solid #ccc;"></canvas>
+    
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Create gradient background
+        const bgGradient = ctx.createLinearGradient(0, 0, 1200, 630);
+        bgGradient.addColorStop(0, '#0f172a');
+        bgGradient.addColorStop(0.5, '#1e293b');
+        bgGradient.addColorStop(1, '#334155');
+        
+        ctx.fillStyle = bgGradient;
+        ctx.fillRect(0, 0, 1200, 630);
+        
+        // Create logo circle
+        const logoGradient = ctx.createLinearGradient(100, 150, 260, 310);
+        logoGradient.addColorStop(0, '#3b82f6');
+        logoGradient.addColorStop(0.5, '#8b5cf6');
+        logoGradient.addColorStop(1, '#06b6d4');
+        
+        ctx.fillStyle = logoGradient;
+        ctx.beginPath();
+        ctx.arc(180, 230, 70, 0, 2 * Math.PI);
+        ctx.fill();
+        
+        // Add white border circle
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(180, 230, 50, 0, 2 * Math.PI);
+        ctx.stroke();
+        
+        // Add KP text
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 42px Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('KP', 180, 245);
+        
+        // Add pulsing dot
+        ctx.fillStyle = '#10b981';
+        ctx.beginPath();
+        ctx.arc(230, 200, 8, 0, 2 * Math.PI);
+        ctx.fill();
+        
+        // Add main title
+        const titleGradient = ctx.createLinearGradient(320, 220, 800, 220);
+        titleGradient.addColorStop(0, '#3b82f6');
+        titleGradient.addColorStop(1, '#8b5cf6');
+        
+        ctx.fillStyle = titleGradient;
+        ctx.font = 'bold 64px Arial, sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText('KP Elite Sports', 320, 240);
+        
+        // Add subtitle
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '32px Arial, sans-serif';
+        ctx.fillText('Fantasy Football AI Analytics', 320, 290);
+        
+        // Add features
+        ctx.fillStyle = '#e2e8f0';
+        ctx.font = '600 24px Arial, sans-serif';
+        ctx.fillText('⚡ Real-time Sleeper Integration', 320, 340);
+        ctx.fillText('🎯 AI-Powered Lineup Optimization', 320, 380);
+        ctx.fillText('📊 Multi-League Portfolio Analysis', 320, 420);
+        ctx.fillText('🎮 Retro Tecmo Bowl Theme', 320, 460);
+        
+        // Add bottom text
+        ctx.fillStyle = '#64748b';
+        ctx.font = '18px Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Advanced Fantasy Football Analytics Platform', 600, 580);
+        
+        // Add decorative elements
+        ctx.globalAlpha = 0.6;
+        
+        // Top right circle
+        const decorGradient = ctx.createLinearGradient(990, 40, 1110, 160);
+        decorGradient.addColorStop(0, '#3b82f6');
+        decorGradient.addColorStop(1, '#06b6d4');
+        
+        ctx.strokeStyle = decorGradient;
+        ctx.lineWidth = 2;
+        ctx.globalAlpha = 0.4;
+        ctx.beginPath();
+        ctx.arc(1050, 100, 60, 0, 2 * Math.PI);
+        ctx.stroke();
+        
+        ctx.globalAlpha = 0.6;
+        ctx.beginPath();
+        ctx.arc(1050, 100, 40, 0, 2 * Math.PI);
+        ctx.stroke();
+        
+        // Bottom left circle
+        ctx.strokeStyle = '#10b981';
+        ctx.globalAlpha = 0.4;
+        ctx.beginPath();
+        ctx.arc(150, 530, 40, 0, 2 * Math.PI);
+        ctx.stroke();
+        
+        ctx.globalAlpha = 0.6;
+        ctx.beginPath();
+        ctx.arc(150, 530, 25, 0, 2 * Math.PI);
+        ctx.stroke();
+        
+        // Download function
+        function downloadPNG() {
+            const link = document.createElement('a');
+            link.download = 'og-image.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+        
+        // Auto download after 1 second
+        setTimeout(downloadPNG, 1000);
+        
+        console.log('Logo created! Download should start automatically.');
+    </script>
+    
+    <br><br>
+    <button onclick="downloadPNG()">Download PNG</button>
+    
+</body>
+</html>

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     siteName: "KP Elite Sports",
     images: [
       {
-        url: "/og-image.svg",
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: "KP Elite Sports - Professional Fantasy Football Analytics Platform",
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "KP Elite Sports - Professional Fantasy Analytics",
     description: "Advanced fantasy football platform by KP Technology Solutions. AI-powered optimization and analytics. 🏆",
-    images: ["/og-image.svg"],
+    images: ["/og-image.png"],
     creator: "@kpelitesports",
   },
   robots: {
@@ -42,5 +42,16 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: "https://kpelitesports.com",
+  },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "32x32" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
   },
 };
