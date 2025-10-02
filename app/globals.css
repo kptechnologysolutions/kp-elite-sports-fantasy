@@ -45,9 +45,74 @@
 :root {
   --radius: 0.5rem;
   
-  /* Sleeper-inspired Light Mode (keeping for reference) */
-  --background: oklch(0.98 0 0);
-  --foreground: oklch(0.15 0 0);
+  /* FANTASY FOOTBALL COMMAND CENTER - NEW DESIGN SYSTEM */
+  
+  /* Core Brand Colors - Championship Drive */
+  --ff-primary: #FF6B35;          /* Victory Orange - Energy, ambition, winning */
+  --ff-secondary: #004B87;        /* Championship Blue - Trust, stability, authority */
+  --ff-accent: #00C851;           /* Success Green - Growth, profit, winning trades */
+  --ff-warning: #FFB300;          /* Alert Gold - Attention, caution, opportunity */
+  --ff-danger: #FF3547;           /* Injury Red - Urgency, risk, critical decisions */
+
+  /* Extended Palette */
+  --ff-dark: #0A0E1A;            /* Midnight - Premium feel, focus */
+  --ff-surface: #1A1F2E;         /* Command Center - Modern, professional */
+  --ff-surface-elevated: #242B3D; /* Elevated surfaces */
+  --ff-text-primary: #FFFFFF;     /* High contrast readability */
+  --ff-text-secondary: #B8BCC8;   /* Supporting information */
+  --ff-text-muted: #6B7280;      /* Deemphasized content */
+
+  /* Status Colors */
+  --ff-live: #FF0844;            /* Live game indicator */
+  --ff-trending-up: #10B981;     /* Positive trends */
+  --ff-trending-down: #EF4444;   /* Negative trends */
+  --ff-neutral: #6B7280;         /* Neutral/unchanged */
+
+  /* Typography Scale */
+  --text-hero: clamp(2.5rem, 5vw, 4rem);     /* 40-64px - Hero numbers */
+  --text-h1: clamp(1.875rem, 4vw, 2.5rem);  /* 30-40px - Page titles */
+  --text-h2: clamp(1.5rem, 3vw, 2rem);      /* 24-32px - Section headers */
+  --text-h3: clamp(1.25rem, 2.5vw, 1.5rem); /* 20-24px - Card titles */
+  --text-body: 1rem;                         /* 16px - Body text */
+  --text-small: 0.875rem;                    /* 14px - Support text */
+  --text-xs: 0.75rem;                        /* 12px - Labels/metadata */
+
+  /* Weight System */
+  --weight-light: 300;
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-black: 900; /* For impact numbers */
+
+  /* Component Spacing */
+  --space-xs: 0.25rem;    /* 4px */
+  --space-sm: 0.5rem;     /* 8px */
+  --space-md: 1rem;       /* 16px */
+  --space-lg: 1.5rem;     /* 24px */
+  --space-xl: 2rem;       /* 32px */
+  --space-2xl: 3rem;      /* 48px */
+  --space-3xl: 4rem;      /* 64px */
+
+  /* Animation Timing */
+  --duration-instant: 0ms;
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 350ms;
+  --duration-slower: 500ms;
+
+  /* Easing Functions */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-circ: cubic-bezier(0.785, 0.135, 0.15, 0.86);
+  --ease-out-back: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+  /* Legacy Light Mode (keeping for compatibility) */
+  --background: var(--ff-dark);
+  --foreground: var(--ff-text-primary);
+  
+  /* Override Shadcn muted colors for better contrast */
+  --muted: var(--ff-surface);
+  --muted-foreground: var(--ff-text-secondary);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.15 0 0);
   --popover: oklch(1 0 0);
@@ -89,8 +154,13 @@
 }
 
 .dark {
-  /* Sleeper-inspired Dark Mode */
-  --background: oklch(0.13 0 0); /* #0e1118 equivalent */
+  /* FANTASY COMMAND CENTER - DARK MODE */
+  --background: var(--ff-dark);
+  --foreground: var(--ff-text-primary);
+  
+  /* Override Shadcn colors with our design system */
+  --muted: var(--ff-surface);
+  --muted-foreground: var(--ff-text-secondary);
   --foreground: oklch(0.98 0 0);
   --card: oklch(0.18 0 0); /* #1a1d29 equivalent */
   --card-foreground: oklch(0.98 0 0);
@@ -139,9 +209,12 @@
   
   body {
     @apply bg-background text-foreground;
+    background: var(--ff-dark);
+    color: var(--ff-text-primary);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   }
   
-  /* Force dark mode for Sleeper theme */
+  /* Force dark mode for Command Center theme */
   html {
     color-scheme: dark;
   }
@@ -185,7 +258,204 @@
     @apply transition-all duration-150;
   }
   
-  /* Custom scrollbar */
+  /* === FANTASY COMMAND CENTER COMPONENTS === */
+  
+  /* Hero Score Display */
+  .score-hero {
+    font-size: var(--text-hero);
+    font-weight: var(--weight-black);
+    line-height: 0.9;
+    color: var(--ff-text-primary);
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Enhanced Card System */
+  .card-hero {
+    background: linear-gradient(135deg, var(--ff-surface) 0%, var(--ff-surface-elevated) 100%);
+    border: 1px solid var(--ff-primary);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 
+      0 4px 24px rgba(255, 107, 53, 0.1),
+      0 0 0 1px rgba(255, 107, 53, 0.05);
+    transition: all var(--duration-normal) var(--ease-out-expo);
+  }
+  
+  .card-hero:hover {
+    transform: translateY(-4px);
+    box-shadow: 
+      0 20px 60px rgba(0, 0, 0, 0.4),
+      0 0 0 1px var(--ff-primary);
+    border-color: var(--ff-primary);
+  }
+  
+  .card-primary {
+    background: var(--ff-surface);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    backdrop-filter: blur(8px);
+    transition: all var(--duration-normal) var(--ease-out-expo);
+  }
+  
+  .card-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  /* Live Indicator */
+  .live-indicator {
+    background: var(--ff-live);
+    color: white;
+    font-weight: var(--weight-bold);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    animation: pulse 2s infinite;
+  }
+  
+  /* Status Badges */
+  .status-winning {
+    background: linear-gradient(135deg, var(--ff-accent), #00D65A);
+    color: white;
+    font-weight: var(--weight-bold);
+  }
+  
+  .status-losing {
+    background: linear-gradient(135deg, var(--ff-danger), #FF4567);
+    color: white;
+    font-weight: var(--weight-bold);
+  }
+  
+  .status-neutral {
+    background: linear-gradient(135deg, var(--ff-neutral), #8B9199);
+    color: white;
+    font-weight: var(--weight-bold);
+  }
+  
+  /* Player Performance Indicators */
+  .performance-hot {
+    background: linear-gradient(135deg, #FF6B35, #FF8C42);
+    color: white;
+  }
+  
+  .performance-cold {
+    background: linear-gradient(135deg, #6B7280, #9CA3AF);
+    color: white;
+  }
+  
+  /* Enhanced Button System */
+  .btn-primary-ff {
+    background: linear-gradient(135deg, var(--ff-primary), #FF8C42);
+    color: white;
+    font-weight: var(--weight-semibold);
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+    transition: all var(--duration-normal) var(--ease-out-expo);
+  }
+  
+  .btn-primary-ff:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4);
+    background: linear-gradient(135deg, #FF8C42, var(--ff-primary));
+  }
+  
+  .btn-secondary-ff {
+    background: var(--ff-surface-elevated);
+    color: var(--ff-text-primary);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-weight: var(--weight-medium);
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    transition: all var(--duration-normal) var(--ease-out-expo);
+  }
+  
+  .btn-secondary-ff:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+  }
+  
+  /* Win Probability Bar */
+  .win-probability-bar {
+    background: linear-gradient(90deg, var(--ff-danger) 0%, var(--ff-warning) 50%, var(--ff-accent) 100%);
+    height: 8px;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .win-probability-indicator {
+    background: white;
+    width: 4px;
+    height: 12px;
+    border-radius: 2px;
+    position: absolute;
+    top: -2px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transition: left var(--duration-slow) var(--ease-out-expo);
+  }
+  
+  /* Trending Animations */
+  .trending-up {
+    color: var(--ff-trending-up);
+    animation: trendingUp 2s ease-in-out infinite;
+  }
+  
+  .trending-down {
+    color: var(--ff-trending-down);
+    animation: trendingDown 2s ease-in-out infinite;
+  }
+  
+  @keyframes trendingUp {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-2px); }
+  }
+  
+  @keyframes trendingDown {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(2px); }
+  }
+  
+  /* Command Center Grid */
+  .command-grid {
+    display: grid;
+    gap: clamp(1rem, 3vw, 2rem);
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    padding: clamp(1rem, 3vw, 2rem);
+  }
+  
+  /* Typography Classes */
+  .text-hero-ff {
+    font-size: var(--text-hero);
+    font-weight: var(--weight-black);
+    line-height: 0.9;
+  }
+  
+  .text-h1-ff {
+    font-size: var(--text-h1);
+    font-weight: var(--weight-bold);
+    line-height: 1.1;
+  }
+  
+  .text-h2-ff {
+    font-size: var(--text-h2);
+    font-weight: var(--weight-semibold);
+    line-height: 1.2;
+  }
+  
+  .text-h3-ff {
+    font-size: var(--text-h3);
+    font-weight: var(--weight-semibold);
+    line-height: 1.3;
+  }
+}
+
+/* Custom scrollbar */
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -503,7 +773,6 @@
       animation: none;
     }
   }
-}
 
 /* Fix dropdown overlapping issues */
 [data-radix-popper-content-wrapper] {

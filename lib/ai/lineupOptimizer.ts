@@ -3,6 +3,8 @@
 
 import OpenAI from 'openai';
 import { Player, Team } from '@/lib/types';
+import { scoringService, ScoringSettings } from '@/lib/services/scoringService';
+import { SleeperLeague } from '@/lib/services/sleeperService';
 
 // Initialize OpenAI (API key would come from environment variables)
 const openai = new OpenAI({
@@ -55,10 +57,11 @@ class LineupOptimizer {
     team: Team,
     week: number,
     settings: {
-      scoringType: 'PPR' | 'STANDARD' | 'HALF_PPR';
+      scoringType?: 'PPR' | 'STANDARD' | 'HALF_PPR';
       riskTolerance: 'CONSERVATIVE' | 'BALANCED' | 'AGGRESSIVE';
       stackPlayers?: boolean;
       avoidPlayers?: string[];
+      league?: SleeperLeague; // For league-specific scoring
     }
   ): Promise<LineupRecommendation> {
     try {

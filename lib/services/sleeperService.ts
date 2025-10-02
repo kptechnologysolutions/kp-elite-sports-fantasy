@@ -113,13 +113,14 @@ class SleeperService {
   private playersCache: Map<string, SleeperPlayer> = new Map();
   private leagueUsersCache: Map<string, Map<string, LeagueUser>> = new Map();
   
-  // Get user by username
-  async getUser(username: string): Promise<SleeperUser> {
-    console.log(`Fetching user data for: ${username}`);
+  // Get user by username with retry logic
+  async getUser(username: string, retryCount = 0): Promise<SleeperUser> {
+    const maxRetries = 2;
+    console.log(`Fetching user data for: ${username}${retryCount > 0 ? ` (retry ${retryCount})` : ''}`);
     
     // Add timeout to prevent hanging
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
     
     try {
       const response = await fetch(`${SLEEPER_BASE_URL}/user/${username}`, {
@@ -145,9 +146,23 @@ class SleeperService {
       return userData;
     } catch (error: any) {
       clearTimeout(timeoutId);
+      
       if (error.name === 'AbortError') {
-        throw new Error('Request timed out. Please check your internet connection and try again.');
+        if (retryCount < maxRetries) {
+          console.log(`Request timed out, retrying... (${retryCount + 1}/${maxRetries})`);
+          await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds before retry
+          return this.getUser(username, retryCount + 1);
+        }
+        throw new Error('Request timed out after multiple attempts. Sleeper API may be experiencing issues.');
       }
+      
+      // For other errors, retry once
+      if (retryCount < maxRetries && error.message.includes('Failed to fetch')) {
+        console.log(`Request failed, retrying... (${retryCount + 1}/${maxRetries})`);
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second before retry
+        return this.getUser(username, retryCount + 1);
+      }
+      
       throw error;
     }
   }

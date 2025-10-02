@@ -11,6 +11,7 @@ import {
   SleeperMatchup,
   LeagueUser
 } from '@/lib/services/sleeperService';
+import { scoringService } from '@/lib/services/scoringService';
 
 interface SleeperStore {
   // User data
@@ -20,6 +21,12 @@ interface SleeperStore {
   // Leagues
   leagues: SleeperLeague[];
   currentLeague: SleeperLeague | null;
+  leagueScoring: {
+    type: string;
+    isIDP: boolean;
+    keyRules: string[];
+    rosterPositions: string[];
+  } | null;
   setCurrentLeague: (league: SleeperLeague | null) => void;
   
   // Rosters & Users
@@ -34,6 +41,7 @@ interface SleeperStore {
   // Matchups
   currentMatchups: SleeperMatchup[];
   currentWeek: number;
+  matchupsWeek: number; // The actual week being displayed for matchups
   seasonMatchups: Map<number, SleeperMatchup[]>;
   
   // Loading states
@@ -62,12 +70,14 @@ const useSleeperStore = create<SleeperStore>()(
       user: null,
       leagues: [],
       currentLeague: null,
+      leagueScoring: null,
       rosters: [],
       leagueUsers: new Map(),
       myRoster: null,
       players: new Map(),
       currentMatchups: [],
       currentWeek: 1,
+      matchupsWeek: 1,
       seasonMatchups: new Map(),
       isLoading: false,
       error: null,
@@ -213,7 +223,12 @@ const useSleeperStore = create<SleeperStore>()(
           if (!league) throw new Error('League not found');
           
           console.log('Store: Found league:', league.name);
-          set({ currentLeague: league });
+          
+          // Calculate league scoring information
+          const leagueScoring = scoringService.getLeagueScoringInfo(league);
+          console.log('Store: League scoring info:', leagueScoring);
+          
+          set({ currentLeague: league, leagueScoring });
           
           // Get NFL state for current week
           console.log('Store: Getting NFL state...');
@@ -222,12 +237,28 @@ const useSleeperStore = create<SleeperStore>()(
           
           // Fetch all league data in parallel
           console.log('Store: Fetching league data...');
-          const [rosters, leagueUsers, matchups, seasonMatchups] = await Promise.all([
+          const [rosters, leagueUsers, seasonMatchups] = await Promise.all([
             sleeperService.getLeagueRosters(leagueId),
             sleeperService.getLeagueUsers(leagueId),
-            sleeperService.getMatchups(leagueId, nflState.week),
             sleeperService.getSeasonMatchups(leagueId, nflState.week)
           ]);
+          
+          // Try to get matchups for current week, fall back to previous weeks if needed
+          let matchups = await sleeperService.getMatchups(leagueId, nflState.week);
+          let actualWeek = nflState.week;
+          
+          // If current week has no matchups, try previous weeks
+          if (matchups.length === 0) {
+            for (let week = nflState.week - 1; week >= 1; week--) {
+              console.log(`Store: Trying week ${week} matchups...`);
+              matchups = await sleeperService.getMatchups(leagueId, week);
+              if (matchups.length > 0) {
+                actualWeek = week;
+                console.log(`Store: Found matchups for week ${week}`);
+                break;
+              }
+            }
+          }
           
           // Find user's roster
           const myRoster = rosters.find(r => r.owner_id === user.user_id) || null;
@@ -238,8 +269,14 @@ const useSleeperStore = create<SleeperStore>()(
             leagueUsers,
             myRoster,
             currentMatchups: matchups,
+            matchupsWeek: actualWeek,
             seasonMatchups
           });
+          
+          // If we had to fall back to a previous week, update the display week
+          if (actualWeek !== nflState.week) {
+            console.log(`Store: Showing week ${actualWeek} matchups instead of week ${nflState.week}`);
+          }
           console.log('Store: League selection complete');
         } catch (error: any) {
           console.error('Store: League selection error:', error);

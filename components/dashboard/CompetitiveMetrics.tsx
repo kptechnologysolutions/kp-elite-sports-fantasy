@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -12,6 +13,8 @@ import { cn } from '@/lib/utils';
 import useSleeperStore from '@/lib/store/useSleeperStore';
 
 export function CompetitiveMetrics() {
+  const [expandedByeWeeks, setExpandedByeWeeks] = useState<{[key: string]: boolean}>({});
+  
   const {
     myRoster,
     rosters,
@@ -189,7 +192,7 @@ export function CompetitiveMetrics() {
               {myWins}-{myLosses}
               {(myRoster.settings?.ties || 0) > 0 && `-${myRoster.settings.ties}`}
             </div>
-            <div className="text-xs text-muted-foreground">
+            <div className="text-xs text-gray-400">
               {winPercentage.toFixed(0)}% Win Rate
             </div>
           </CardContent>
@@ -258,7 +261,7 @@ export function CompetitiveMetrics() {
             )}>
               {avgPointsFor.toFixed(1)}
             </div>
-            <div className="text-xs text-muted-foreground">
+            <div className="text-xs text-gray-400">
               {avgPointsFor > leagueAvgPoints ? '+' : ''}{(avgPointsFor - leagueAvgPoints).toFixed(1)} vs avg
             </div>
           </CardContent>
@@ -280,7 +283,7 @@ export function CompetitiveMetrics() {
                 {recentForm.join('-')}
               </span>
             </div>
-            <div className="text-xs text-muted-foreground">
+            <div className="text-xs text-gray-400">
               Last 3 weeks
             </div>
           </CardContent>
@@ -303,7 +306,7 @@ export function CompetitiveMetrics() {
             )}>
               {sosRating.toUpperCase()}
             </div>
-            <div className="text-xs text-muted-foreground">
+            <div className="text-xs text-gray-400">
               {remainingWeeks} games left
             </div>
           </CardContent>
@@ -325,7 +328,7 @@ export function CompetitiveMetrics() {
                 <div className="font-semibold">
                   {leagueUsers.get(nextOpponent.owner_id)?.display_name || 'Opponent'}
                 </div>
-                <div className="text-sm text-muted-foreground">
+                <div className="text-sm text-gray-400">
                   Rank #{nextOppRank} • {(nextOppWinPct * 100).toFixed(0)}% Win Rate
                 </div>
               </div>
@@ -343,12 +346,28 @@ export function CompetitiveMetrics() {
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>
             <div className="font-medium mb-1">Upcoming Bye Weeks:</div>
-            {upcomingByes.map(([week, players]) => (
-              <div key={week} className="text-sm">
-                Week {week}: {players.slice(0, 3).join(', ')}
-                {players.length > 3 && ` +${players.length - 3} more`}
-              </div>
-            ))}
+            {upcomingByes.map(([week, players]) => {
+              const weekKey = `week-${week}`;
+              const isExpanded = expandedByeWeeks[weekKey];
+              const displayPlayers = isExpanded ? players : players.slice(0, 3);
+              
+              return (
+                <div key={week} className="text-sm">
+                  Week {week}: {displayPlayers.join(', ')}
+                  {players.length > 3 && (
+                    <button
+                      onClick={() => setExpandedByeWeeks(prev => ({
+                        ...prev,
+                        [weekKey]: !prev[weekKey]
+                      }))}
+                      className="text-blue-400 hover:text-blue-300 ml-1 underline cursor-pointer"
+                    >
+                      {isExpanded ? ' show less' : ` +${players.length - 3} more`}
+                    </button>
+                  )}
+                </div>
+              );
+            })}
           </AlertDescription>
         </Alert>
       )}
@@ -360,7 +379,7 @@ export function CompetitiveMetrics() {
         </CardHeader>
         <CardContent>
           <Progress value={(currentWeek / 14) * 100} className="h-2" />
-          <div className="flex justify-between text-xs text-muted-foreground mt-1">
+          <div className="flex justify-between text-xs text-gray-400 mt-1">
             <span>Week {currentWeek}</span>
             <span>{14 - currentWeek} weeks until playoffs</span>
           </div>

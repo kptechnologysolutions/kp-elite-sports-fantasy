@@ -260,7 +260,7 @@ export function AdvancedAnalytics() {
     return (
       <Card>
         <CardContent className="py-8">
-          <div className="text-center text-muted-foreground">
+          <div className="text-center text-gray-400">
             Please select a league to view analytics
           </div>
         </CardContent>
@@ -274,7 +274,7 @@ export function AdvancedAnalytics() {
         <CardContent className="py-8">
           <div className="text-center">
             <Activity className="h-8 w-8 mx-auto animate-spin text-primary mb-4" />
-            <p className="text-muted-foreground">Calculating advanced analytics...</p>
+            <p className="text-gray-400">Calculating advanced analytics...</p>
           </div>
         </CardContent>
       </Card>
@@ -296,7 +296,7 @@ export function AdvancedAnalytics() {
             <div className={cn("text-3xl font-bold", getEfficiencyColor(teamAnalytics.efficiency))}>
               {teamAnalytics.efficiency}%
             </div>
-            <div className="text-sm text-muted-foreground">vs League Avg</div>
+            <div className="text-sm text-gray-400">vs League Avg</div>
             <Progress value={teamAnalytics.efficiency} className="mt-2" />
           </CardContent>
         </Card>
@@ -312,7 +312,7 @@ export function AdvancedAnalytics() {
             <div className={cn("text-3xl font-bold", getConsistencyColor(teamAnalytics.consistency))}>
               {teamAnalytics.consistency}%
             </div>
-            <div className="text-sm text-muted-foreground">Week to Week</div>
+            <div className="text-sm text-gray-400">Week to Week</div>
             <Progress value={teamAnalytics.consistency} className="mt-2" />
           </CardContent>
         </Card>
@@ -329,12 +329,12 @@ export function AdvancedAnalytics() {
               <div className="text-lg font-bold text-green-600">
                 {teamAnalytics.ceiling.toFixed(1)}
               </div>
-              <div className="text-sm text-muted-foreground">/</div>
+              <div className="text-sm text-gray-400">/</div>
               <div className="text-lg font-bold text-red-600">
                 {teamAnalytics.floor.toFixed(1)}
               </div>
             </div>
-            <div className="text-sm text-muted-foreground">Best/Worst Week</div>
+            <div className="text-sm text-gray-400">Best/Worst Week</div>
           </CardContent>
         </Card>
         
@@ -353,7 +353,7 @@ export function AdvancedAnalytics() {
             )}>
               {teamAnalytics.trendScore}%
             </div>
-            <div className="text-sm text-muted-foreground">Last 3 Weeks</div>
+            <div className="text-sm text-gray-400">Last 3 Weeks</div>
           </CardContent>
         </Card>
       </div>
@@ -394,22 +394,22 @@ export function AdvancedAnalytics() {
                           </Badge>
                         )}
                       </div>
-                      <div className="text-sm text-muted-foreground">
+                      <div className="text-sm text-gray-400">
                         {pos.depth} player{pos.depth !== 1 ? 's' : ''}
                       </div>
                     </div>
                     
                     <div className="grid grid-cols-3 gap-4 text-sm">
                       <div>
-                        <div className="text-muted-foreground">Avg Age</div>
+                        <div className="text-gray-400">Avg Age</div>
                         <div className="font-medium">{pos.averageAge} years</div>
                       </div>
                       <div>
-                        <div className="text-muted-foreground">Upside</div>
+                        <div className="text-gray-400">Upside</div>
                         <div className="font-medium">{pos.upside}%</div>
                       </div>
                       <div>
-                        <div className="text-muted-foreground">Stability</div>
+                        <div className="text-gray-400">Stability</div>
                         <div className="font-medium">{pos.stability}%</div>
                       </div>
                     </div>
@@ -444,7 +444,7 @@ export function AdvancedAnalytics() {
                         </div>
                         <div>
                           <div className="font-medium">{trend.points.toFixed(1)} pts</div>
-                          <div className="text-sm text-muted-foreground">
+                          <div className="text-sm text-gray-400">
                             #{trend.rank} in league
                           </div>
                         </div>
@@ -478,7 +478,7 @@ export function AdvancedAnalytics() {
                     <div className={cn("text-lg font-bold capitalize", getRiskColor(teamAnalytics.injuryRisk))}>
                       {teamAnalytics.injuryRisk}
                     </div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-sm text-gray-400">
                       Based on player ages and positions
                     </div>
                   </div>
@@ -491,7 +491,7 @@ export function AdvancedAnalytics() {
                     <div className="text-lg font-bold">
                       {teamAnalytics.strengthOfSchedule.toFixed(2)}
                     </div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-sm text-gray-400">
                       Remaining opponents difficulty
                     </div>
                   </div>
@@ -504,7 +504,7 @@ export function AdvancedAnalytics() {
                     <div className="text-lg font-bold">
                       {teamAnalytics.tradeValue}%
                     </div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-sm text-gray-400">
                       Overall team attractiveness
                     </div>
                   </div>

@@ -18,6 +18,7 @@ import {
   BarChart3
 } from 'lucide-react';
 import useSleeperStore from '@/lib/store/useSleeperStore';
+import { scoringService } from '@/lib/services/scoringService';
 import { cn } from '@/lib/utils';
 
 interface PlayerPerformance {
@@ -50,6 +51,7 @@ export function PerformanceWidget() {
   
   const {
     currentLeague,
+    leagueScoring,
     rosters,
     leagueUsers,
     players,
@@ -188,7 +190,7 @@ export function PerformanceWidget() {
     return (
       <Card>
         <CardContent className="py-8">
-          <div className="text-center text-muted-foreground">
+          <div className="text-center text-gray-400">
             Please select a league to view performance data
           </div>
         </CardContent>
@@ -207,6 +209,12 @@ export function PerformanceWidget() {
             </CardTitle>
             <CardDescription>
               Track player and team performance trends
+              {leagueScoring && (
+                <span className="block text-xs text-orange-500 mt-1">
+                  • Calculated using {leagueScoring.type} scoring
+                  {leagueScoring.isIDP && " with IDP stats"}
+                </span>
+              )}
             </CardDescription>
           </div>
           
@@ -250,7 +258,7 @@ export function PerformanceWidget() {
                     
                     <div>
                       <div className="font-medium">{player.playerName}</div>
-                      <div className="text-sm text-muted-foreground">
+                      <div className="text-sm text-gray-400">
                         {player.team}
                       </div>
                     </div>
@@ -259,19 +267,19 @@ export function PerformanceWidget() {
                   <div className="flex items-center gap-4">
                     <div className="text-right">
                       <div className="font-bold">{player.avgPoints}</div>
-                      <div className="text-xs text-muted-foreground">Avg PPG</div>
+                      <div className="text-xs text-gray-400">Avg PPG</div>
                     </div>
                     
                     <div className="text-right">
                       <div className="font-medium">{player.lastWeekPoints}</div>
-                      <div className="text-xs text-muted-foreground">Last Week</div>
+                      <div className="text-xs text-gray-400">Last Week</div>
                     </div>
                     
                     <div className="text-right min-w-[60px]">
                       <div className={cn("font-medium", getConsistencyColor(player.consistency))}>
                         {player.consistency}%
                       </div>
-                      <div className="text-xs text-muted-foreground">Consistent</div>
+                      <div className="text-xs text-gray-400">Consistent</div>
                     </div>
                   </div>
                 </div>
@@ -297,7 +305,7 @@ export function PerformanceWidget() {
                         index === 1 ? "text-gray-400" : "text-amber-600"
                       )} />
                     )}
-                    <span className="text-sm font-medium text-muted-foreground">
+                    <span className="text-sm font-medium text-gray-400">
                       #{index + 1}
                     </span>
                   </div>
@@ -309,7 +317,7 @@ export function PerformanceWidget() {
                         <Badge variant="secondary" className="text-xs">You</Badge>
                       )}
                     </div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-sm text-gray-400">
                       {team.record} • {team.avgPointsFor} PPG
                     </div>
                   </div>
@@ -318,7 +326,7 @@ export function PerformanceWidget() {
                 <div className="flex items-center gap-4">
                   <div className="text-right">
                     <div className="font-bold">{team.powerRanking}</div>
-                    <div className="text-xs text-muted-foreground">Power</div>
+                    <div className="text-xs text-gray-400">Power</div>
                   </div>
                   
                   <div className="flex flex-col gap-1">

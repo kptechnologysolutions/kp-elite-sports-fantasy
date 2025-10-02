@@ -19,6 +19,8 @@ import { PlayoffCalculator } from '@/components/analytics/PlayoffCalculator';
 import { LiveScoring } from '@/components/live/LiveScoring';
 import { AdvancedAnalytics } from '@/components/dashboard/AdvancedAnalytics';
 import { PerformanceWidget } from '@/components/dashboard/PerformanceWidget';
+import { CommandCenterRecommendations } from '@/components/recommendations/CommandCenterRecommendations';
+import { EnhancedRecommendationsUI } from '@/components/recommendations/EnhancedRecommendationsUI';
 import { 
   Trophy, TrendingUp, Users, Activity, RefreshCw, 
   CheckCircle2, Clock, AlertTriangle, Star, AlertCircle, Swords
@@ -34,11 +36,13 @@ export default function SleeperDashboard() {
     user,
     leagues,
     currentLeague,
+    leagueScoring,
     myRoster,
     rosters,
     leagueUsers,
     currentMatchups,
     currentWeek,
+    matchupsWeek,
     players,
     isLoading,
     error,
@@ -126,10 +130,41 @@ export default function SleeperDashboard() {
       
       {/* Multi-Team Switcher */}
       {leagues.length > 0 && (
-        <div className="container mx-auto p-4">
+        <div className="container mx-auto px-2 sm:px-4 py-2 sm:py-4">
           <div className="max-w-md">
             <MultiTeamSwitcher />
           </div>
+        </div>
+      )}
+      
+      {/* League Scoring Information */}
+      {currentLeague && leagueScoring && (
+        <div className="container mx-auto px-2 sm:px-4">
+          <Card className="mb-4">
+            <CardHeader className="pb-3 px-3 sm:px-6">
+              <CardTitle className="flex items-center gap-2 text-sm">
+                <Activity className="h-4 w-4" />
+                League Scoring: {leagueScoring.type}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0 px-3 sm:px-6">
+              <div className="flex flex-wrap gap-1 sm:gap-2">
+                {leagueScoring.keyRules.map((rule, index) => (
+                  <Badge key={index} variant="outline" className="text-xs">
+                    {rule}
+                  </Badge>
+                ))}
+                {leagueScoring.isIDP && (
+                  <Badge variant="default" className="text-xs bg-orange-600 hover:bg-orange-700">
+                    IDP League
+                  </Badge>
+                )}
+              </div>
+              <div className="mt-2 text-xs text-gray-400">
+                Positions: {leagueScoring.rosterPositions.join(', ')}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       )}
       
@@ -183,7 +218,7 @@ export default function SleeperDashboard() {
       )}
       
       {currentLeague && (
-        <main className="container mx-auto p-4 space-y-6">
+        <main className="container mx-auto px-2 sm:px-4 py-4 space-y-4 md:space-y-6">
           {/* Enhanced Competitive Metrics */}
           <CompetitiveMetrics />
           
@@ -192,7 +227,14 @@ export default function SleeperDashboard() {
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle>Week {currentWeek} Matchup</CardTitle>
+                  <CardTitle>
+                    Week {matchupsWeek} Matchup
+                    {matchupsWeek !== currentWeek && (
+                      <Badge variant="outline" className="ml-2">
+                        Most Recent
+                      </Badge>
+                    )}
+                  </CardTitle>
                   <div className="flex gap-2">
                     <Badge variant="default">
                       <Activity className="h-3 w-3 mr-1" />
@@ -212,8 +254,8 @@ export default function SleeperDashboard() {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-3 gap-4">
+              <CardContent className="px-3 sm:px-6">
+                <div className="grid grid-cols-3 gap-2 sm:gap-4">
                   <div className="text-center">
                     <div className="font-medium mb-2">{getRosterName(myMatchup.roster_id)}</div>
                     <div className="text-3xl font-bold">{myMatchup.points.toFixed(1)}</div>
@@ -261,14 +303,19 @@ export default function SleeperDashboard() {
           )}
           
           {/* Main Content Tabs */}
-          <Tabs defaultValue="roster" className="space-y-4">
-            <TabsList className="grid grid-cols-5 w-full">
-              <TabsTrigger value="roster">My Roster</TabsTrigger>
-              <TabsTrigger value="standings">Standings</TabsTrigger>
-              <TabsTrigger value="scoreboard">Scoreboard</TabsTrigger>
-              <TabsTrigger value="playoffs">Playoffs</TabsTrigger>
-              <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <Tabs defaultValue="recommendations" className="space-y-4">
+            <TabsList className="grid grid-cols-3 sm:grid-cols-6 w-full overflow-x-auto">
+              <TabsTrigger value="recommendations" className="text-xs sm:text-sm">Recommendations</TabsTrigger>
+              <TabsTrigger value="roster" className="text-xs sm:text-sm">My Roster</TabsTrigger>
+              <TabsTrigger value="standings" className="text-xs sm:text-sm">Standings</TabsTrigger>
+              <TabsTrigger value="scoreboard" className="text-xs sm:text-sm">Scoreboard</TabsTrigger>
+              <TabsTrigger value="playoffs" className="text-xs sm:text-sm">Playoffs</TabsTrigger>
+              <TabsTrigger value="analytics" className="text-xs sm:text-sm">Analytics</TabsTrigger>
             </TabsList>
+            
+            <TabsContent value="recommendations">
+              <CommandCenterRecommendations />
+            </TabsContent>
             
             <TabsContent value="roster">
               {myRoster && myMatchup ? (
@@ -354,8 +401,20 @@ export default function SleeperDashboard() {
           {/* League Scoreboard - Extracted from tabs for prominence */}
           <Card>
             <CardHeader>
-              <CardTitle>Week {currentWeek} League Matchups</CardTitle>
-              <CardDescription>Current week scoreboard for {currentLeague.name}</CardDescription>
+              <CardTitle>
+                Week {matchupsWeek} League Matchups
+                {matchupsWeek !== currentWeek && (
+                  <Badge variant="outline" className="ml-2">
+                    Most Recent
+                  </Badge>
+                )}
+              </CardTitle>
+              <CardDescription>
+                {matchupsWeek === currentWeek 
+                  ? `Current week scoreboard for ${currentLeague.name}`
+                  : `Week ${currentWeek} hasn't started yet - showing Week ${matchupsWeek} results`
+                }
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 gap-3">

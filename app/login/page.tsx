@@ -315,7 +315,7 @@ export default function LoginPage() {
             
             <Button
               type="submit"
-              className="w-full h-12 text-base font-semibold"
+              className="w-full h-12 text-base font-semibold border-2 border-green-600 bg-green-600 hover:bg-green-700 hover:border-green-700 disabled:bg-green-500 disabled:border-green-500 disabled:opacity-75 text-white shadow-lg transition-all duration-200 focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
               disabled={isLoading}
             >
               {isLoading ? (

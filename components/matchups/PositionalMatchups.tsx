@@ -380,7 +380,7 @@ export function PositionalMatchups() {
                   {trend === 'hot' && <Flame className="h-3 w-3 text-orange-500" />}
                   {trend === 'cold' && <Snowflake className="h-3 w-3 text-blue-500" />}
                 </div>
-                <div className="text-xs text-muted-foreground flex items-center gap-2">
+                <div className="text-xs flex items-center gap-2" style={{ color: 'var(--ff-text-secondary)' }}>
                   <span>{player.position} • {player.team || 'FA'}</span>
                   {player.injury_status && (
                     <Badge variant="destructive" className="text-xs h-4">
@@ -413,7 +413,7 @@ export function PositionalMatchups() {
                 )}>
                   {currentPoints.toFixed(1)}
                 </div>
-                <div className="text-xs text-muted-foreground">Week {currentWeek}</div>
+                <div className="text-xs text-gray-400">Week {currentWeek}</div>
               </div>
               
               <Button
@@ -431,7 +431,7 @@ export function PositionalMatchups() {
             <div className="grid grid-cols-5 gap-1 text-xs mb-2">
               {statDisplay.map((stat) => (
                 <div key={stat.key} className="text-center">
-                  <div className="text-muted-foreground">{stat.label}</div>
+                  <div className="text-gray-400">{stat.label}</div>
                   <div className={cn(
                     "font-medium",
                     stat.highlight && "text-green-500",
@@ -447,11 +447,11 @@ export function PositionalMatchups() {
           {/* Points Summary */}
           <div className="grid grid-cols-4 gap-2 text-xs">
             <div>
-              <div className="text-muted-foreground">Avg</div>
+              <div className="text-gray-400">Avg</div>
               <div className="font-medium">{seasonAvg.toFixed(1)}</div>
             </div>
             <div>
-              <div className="text-muted-foreground">L3</div>
+              <div className="text-gray-400">L3</div>
               <div className={cn(
                 "font-medium",
                 last3Avg > seasonAvg * 1.1 && "text-green-500",
@@ -461,11 +461,11 @@ export function PositionalMatchups() {
               </div>
             </div>
             <div>
-              <div className="text-muted-foreground">Proj</div>
+              <div className="text-gray-400">Proj</div>
               <div className="font-medium">{projection.toFixed(1)}</div>
             </div>
             <div>
-              <div className="text-muted-foreground">Var</div>
+              <div className="text-gray-400">Var</div>
               <div className={cn(
                 "font-medium",
                 consistency < 5 && "text-green-500",
@@ -487,7 +487,7 @@ export function PositionalMatchups() {
             <div className="grid grid-cols-2 gap-2 text-xs">
               {getStatDisplay(player, seasonStatAvgs).map((stat) => (
                 <div key={stat.key} className="flex justify-between">
-                  <span className="text-muted-foreground">{stat.label}:</span>
+                  <span className="text-gray-400">{stat.label}:</span>
                   <span className={cn(
                     "font-medium",
                     stat.highlight && "text-green-500",
@@ -502,7 +502,7 @@ export function PositionalMatchups() {
             {/* Scoring Breakdown */}
             <div className="mt-3 pt-3 border-t">
               <div className="text-xs font-medium mb-1">Points Breakdown</div>
-              <div className="text-xs text-muted-foreground">
+              <div className="text-xs text-gray-400">
                 Based on league scoring: {calculatePointsFromStats(currentStats).toFixed(1)} pts
               </div>
             </div>
@@ -530,7 +530,7 @@ export function PositionalMatchups() {
               <div className="text-sm font-medium">
                 vs {leagueUsers.get(opponentRoster.owner_id)?.display_name}
               </div>
-              <div className="text-xs text-muted-foreground">
+              <div className="text-xs text-gray-400">
                 Week {currentWeek} Opponent
               </div>
             </div>
@@ -560,7 +560,7 @@ export function PositionalMatchups() {
                   </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{myPositionStrength.toFixed(1)}</div>
-                  <div className="text-xs text-muted-foreground">
+                  <div className="text-xs text-gray-400">
                     Total avg points/week
                   </div>
                 </CardContent>
@@ -572,7 +572,7 @@ export function PositionalMatchups() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{oppPositionStrength.toFixed(1)}</div>
-                  <div className="text-xs text-muted-foreground">
+                  <div className="text-xs text-gray-400">
                     Total avg points/week
                   </div>
                 </CardContent>
@@ -617,7 +617,7 @@ export function PositionalMatchups() {
                       <PlayerCard key={metrics.player.player_id} metrics={metrics} />
                     ))
                   ) : (
-                    <div className="text-sm text-muted-foreground p-3 border rounded-lg">
+                    <div className="text-sm text-gray-400 p-3 border rounded-lg">
                       No {selectedPosition}s on roster
                     </div>
                   )}
@@ -635,7 +635,7 @@ export function PositionalMatchups() {
                       <PlayerCard key={metrics.player.player_id} metrics={metrics} />
                     ))
                   ) : (
-                    <div className="text-sm text-muted-foreground p-3 border rounded-lg">
+                    <div className="text-sm text-gray-400 p-3 border rounded-lg">
                       No {selectedPosition}s on roster
                     </div>
                   )}
